@@ -28,7 +28,7 @@ public class NoiseUtils {
         return t * t * t * p + t * t * ((a - b) - p) + t * (c - a) + b;
     }
 
-    public int castFloatToInt(final float f) {
+    public static int castFloatToInt(final float f) {
         int i = Float.floatToRawIntBits(f);
         return i ^ (i >> 16);
     }

@@ -193,6 +193,11 @@ public class OriginalFastNoise {
 		return this;
 	}
 
+	public OriginalFastNoise SetCellularJitter(float jitter) {
+		m_cellularJitterX = m_cellularJitterY = m_cellularJitterZ = jitter;
+		return this;
+	}
+
 	// Sets whether to apply a gradient perturb to all input values.
 	public OriginalFastNoise SetGradientPerturb(boolean perturb) {
 		m_gradientPerturb = perturb;

@@ -24,9 +24,9 @@ sourceSets {
       srcDir 'src/main/java'
     }
   }
-  performanceTest {
+  test {
     java {
-      srcDir 'src/performanceTest/java'
+      srcDir 'src/test/java'
     }
   }
 }

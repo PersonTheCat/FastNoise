@@ -1,88 +1,72 @@
-# FastNoise
+# PersonTheCat/FastNoise
 
-This is the Java version of [FastNoise](https://github.com/Auburns/FastNoise)
+A rewrite of the legacy [FastNoise_Java](https://github.com/Auburn/FastNoise_Java) project. Unlike the
+original, this library is highly extensible. It replaces most of the existing enum types with functional
+interfaces and provides concrete implementations for each of the original FastNoise generators. 
 
-FastNoise is an open source noise generation library with a large collection of different noise algorithms. This library has been designed for realtime usage from the ground up, so has been optimised for speed without sacrificing noise quality.
+# Motivations and Goals
 
-This project started when my search to find a good noise library for procedural terrain generation concluded without an obvious choice. I enjoyed the options and customisation of Accidental Noise Library and the speed of LibNoise, so many of the techniques from these libraries and the knowledge I gained from reading through their source has gone into creating FastNoise.
+It is my hope that this library will facilitate generation of custom, highly-optimized noise generators.
+As of this time, it is merely a work-in-progress skeleton used exclusively for performance testing. 
+Please create an issue here if you are able to contribute to the project and help us achieve this goal.
 
-I have now also created [FastNoise SIMD](https://github.com/Auburns/FastNoiseSIMD), which utilises SIMD CPU instructions to gain huge performance boosts. It is slightly less flexible and cannot be converted to other languages, but if you can I would highly suggest using this for heavy noise generation loads.
+# Using This Library
 
-### Features
-- Value Noise 2D, 3D
-- Perlin Noise 2D, 3D
-- Simplex Noise 2D, 3D, 4D
-- Cubic Noise 2D, 3D
-- Gradient Perturb 2D, 3D
-- Multiple fractal options for all of the above
-- Cellular (Voronoi) Noise 2D, 3D
-- White Noise 2D, 3D, 4D
+To create a new generator, start by constructing a `NoiseDescriptor`.  Noise Descriptor is a data
+transfer object designed to create and configure one of the included generator types. It provides an
+API very similar to that of the original library and can be used to **generate** a new FastNoise wrapper
+object.
 
-### Wiki
-Usage and documentation available in wiki
+```java
+final FastNoise generator = FastNoise.createDescriptor()
+  .noise(NoiseType.SIMPLEX_FRACTAL)
+  .interpolation(InterpolationType.FBM)
+  .frequency(0.1F)
+  .generate();
+```
 
-[Wiki Link](https://github.com/Auburns/FastNoise/wiki)
+## Custom Noise Generators
 
-### Related repositories
- - [FastNoise C#](https://github.com/Auburns/FastNoise_CSharp)
- - [FastNoise SIMD](https://github.com/Auburns/FastNoiseSIMD)
- - [FastNoise Unity](https://www.assetstore.unity3d.com/en/#!/content/70706)
- - [Unreal FastNoise](https://github.com/midgen/UnrealFastNoise)
+To supply a custom noise generator into the wrapper, create a class extending from `NoiseGenerator`.
+Constructing this object requires an instance of `NoiseDescriptor`, which is what enables your generator
+to take advantage of the common configurations.
 
-Credit to [CubicNoise](https://github.com/jobtalle/CubicNoise) for the cubic noise algorithm
+```java
+final FastNoise generator = FastNoise.createDescriptor()
+  .provider(MyNoiseGenerator::new)
+  .generate();
+```
 
-## FastNoise Preview
+## Wrapping Bare-bones Noise Functions
 
-I have written a compact testing application for all the features included in FastNoise with a visual representation. I use this for development purposes and testing noise settings used in terrain generation.
+Alternatively, FastNoise is capable of wrapping raw noise functions. A convenient way to use this feature
+is to construct a `DummyNoiseWrapper` and pass it directly into the FastNoise constructor.
 
-Download links can be found in the [Releases Section](https://github.com/Auburns/FastNoise/releases).
+```java
+final NoiseWrapper wrapper = new DummyNoiseWrapper()
+  .wrapNoise2((x, y) -> 1);
 
-![FastNoise Preview](http://i.imgur.com/uG7Vepc.png)
+final FastNoise generator = new FastNoise(wrapper);
+```
+
+## Using Noise Modifiers
+
+`NoiseModifier` is a data transfer object which contains a few settings related to the amplitude of the
+generator output and thresholds used for creating booleans from the output. It can be constructed with a
+similar API.
+
+```java
+final NoiseWrapper wrapper = new DummyNoiseWrapper()
+  .wrapNoise2((x, y) -> 0.5)
+  .wrapNoise3((x, y, z) -> 0.2);
+
+final NoiseModifier modifier = new NoiseModifier()
+  .minThreshold(0.2)
+  .maxThreshold(0.5);
+
+final FastNoise generator = new FastNoise(wrapper, modifier);
+
+final boolean demo = generator.getBoolean(1, 2);
+```
 
 
-# Performance Comparisons
-Benchmarking done on C++ version.
-
-Using default noise settings on FastNoise and matching those settings across the other libraries where possible.
-
-Timings below are x1000 ns to generate 32x32x32 points of noise on a single thread.
-
-- CPU: Intel Xeon Skylake @ 2.0Ghz
-- Compiler: Intel 17.0 x64
-
-| Noise Type  |FastNoise | FastNoiseSIMD AVX2 |  LibNoise | FastNoise 2D |
-|-------------|----------|--------------------|-----------|--------------|
-| White Noise |141       | 13                 |           | 111          |
-| Value       |635       | 160                |           | 364          |
-| Perlin      |964       | 342                |  1409     | 476          |
-| Simplex     |1189      | 340                |           | 875          |
-| Cellular    |2933      | 1472               |  56960    | 1074         |
-| Cubic       |2933      | 1393               |           | 872          |
-
-Comparision of fractal performance [here](https://github.com/Auburns/FastNoiseSIMD/wiki/In-depth-SIMD-level).
-
-# Examples
-## Cellular Noise
-![Cellular Noise](http://i.imgur.com/quAic8M.png)
-
-![Cellular Noise](http://i.imgur.com/gAd9Y2t.png)
-
-![Cellular Noise](http://i.imgur.com/7kJd4fA.png)
-
-## Fractal Noise
-![Fractal Noise](http://i.imgur.com/XqSD7eR.png)
-
-## Value Noise
-![Value Noise](http://i.imgur.com/X2lbFZR.png)
-
-## White Noise
-![White Noise](http://i.imgur.com/QIlYvyQ.png)
-
-## Gradient Perturb
-![Gradient Perturb](http://i.imgur.com/gOjc1u1.png)
-
-![Gradient Perturb](http://i.imgur.com/ui045Bk.png)
-
-![Gradient Perturb](http://i.imgur.com/JICFypT.png)
-
-# Any suggestions or questions welcome

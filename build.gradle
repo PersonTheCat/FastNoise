@@ -1,0 +1,36 @@
+apply plugin: 'java'
+
+version = '0.1'
+group = 'PersonTheCat'
+description = 'An extensible reimplementation of Auburn\'s FastNoise library'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compileOnly group: 'org.jetbrains', name: 'annotations', version: '16.0.2'
+
+  compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
+  annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
+}
+
+sourceSets {
+  main {
+    java {
+      srcDir 'src/main/java'
+    }
+  }
+  performanceTest {
+    java {
+      srcDir 'src/performanceTest/java'
+    }
+  }
+}
+
+artifacts {
+  archives jar
+}

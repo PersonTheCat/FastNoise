@@ -1,12 +1,11 @@
 package personthecat.fastnoise.data;
 
 import org.jetbrains.annotations.Nullable;
-import personthecat.fastnoise.function.FractalFunction;
 import personthecat.fastnoise.util.EnumNamingService;
 
 import java.util.regex.Pattern;
 
-public enum FractalType implements FractalFunction {
+public enum FractalType {
     FBM {
         @Override
         public float apply(final float f) {
@@ -25,6 +24,8 @@ public enum FractalType implements FractalFunction {
             return 1 - Math.abs(f);
         }
     };
+
+    public abstract float apply(float f);
 
     final Pattern pattern = EnumNamingService.createPattern(this);
     final String formatted = EnumNamingService.formatName(this);

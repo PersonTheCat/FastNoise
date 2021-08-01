@@ -8,28 +8,14 @@ import static personthecat.fastnoise.util.NoiseUtils.gradient3;
 import static personthecat.fastnoise.util.NoiseUtils.lerp;
 import static personthecat.fastnoise.util.NoiseUtils.value1;
 
-public class PerlinNoise extends NoiseGenerator {
+public class PerlinNoise extends FastNoise {
 
     public PerlinNoise(final NoiseDescriptor cfg) {
         super(cfg);
     }
 
     @Override
-    public float getNoise(float x) {
-        return this.singlePerlin(this.seed, x);
-    }
-
-    @Override
-    public float getNoise(float x, float y) {
-        return this.singlePerlin(this.seed, x, y);
-    }
-
-    @Override
-    public float getNoise(final float x, final float y, final float z) {
-        return this.singlePerlin(this.seed, x, y, z);
-    }
-
-    public final float singlePerlin(final int seed, float x) {
+    public final float getSingle(final int seed, float x) {
         x -= fastFloor(x);
         float u = this.interpolation.interpolate(x, 0);
         float gradA = value1(seed, x);
@@ -37,7 +23,8 @@ public class PerlinNoise extends NoiseGenerator {
         return lerp(u, gradA, gradB);
     }
 
-    public final float singlePerlin(final int seed, final float x, final float y) {
+    @Override
+    public float getSingle(final int seed, final float x, final float y) {
         final int x0 = fastFloor(x);
         final int y0 = fastFloor(y);
         final int x1 = x0 + 1;
@@ -57,7 +44,8 @@ public class PerlinNoise extends NoiseGenerator {
         return lerp(xf0, xf1, ys);
     }
 
-    public final float singlePerlin(final int seed, final float x, final float y, final float z) {
+    @Override
+    public float getSingle(final int seed, final float x, final float y, final float z) {
         final int x0 = fastFloor(x);
         final int y0 = fastFloor(y);
         final int z0 = fastFloor(z);

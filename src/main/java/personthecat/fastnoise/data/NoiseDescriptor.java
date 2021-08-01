@@ -2,16 +2,13 @@ package personthecat.fastnoise.data;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import personthecat.fastnoise.FastNoise;
-import personthecat.fastnoise.function.FractalFunction;
-import personthecat.fastnoise.function.InterpolationFunction;
 import personthecat.fastnoise.function.NoiseProvider;
 import personthecat.fastnoise.generator.Cellular1EdgeNoise;
 import personthecat.fastnoise.generator.Cellular2EdgeNoise;
 import personthecat.fastnoise.generator.Cellular3EdgeNoise;
 import personthecat.fastnoise.generator.CubicNoise;
 import personthecat.fastnoise.generator.CubicFractalNoise;
-import personthecat.fastnoise.generator.NoiseGenerator;
+import personthecat.fastnoise.generator.FastNoise;
 import personthecat.fastnoise.generator.PerlinNoise;
 import personthecat.fastnoise.generator.PerlinFractalNoise;
 import personthecat.fastnoise.generator.SimplexNoise;
@@ -26,8 +23,8 @@ public class NoiseDescriptor {
 
     private NoiseProvider provider = d -> this.selectGenerator();
     private NoiseType noise = NoiseType.SIMPLEX_FRACTAL;
-    private FractalFunction fractal = FractalType.FBM;
-    private InterpolationFunction interpolation = InterpolationType.LINEAR;
+    private FractalType fractal = FractalType.FBM;
+    private InterpolationType interpolation = InterpolationType.LINEAR;
     private CellularDistanceType distance = CellularDistanceType.EUCLIDEAN;
     private CellularReturnType cellularReturn = CellularReturnType.CELL_VALUE;
     private NoiseDescriptor noiseLookup = null;
@@ -87,7 +84,7 @@ public class NoiseDescriptor {
         return this;
     }
 
-    private NoiseGenerator selectGenerator() {
+    private FastNoise selectGenerator() {
         switch (this.noise) {
             case VALUE: return new ValueNoise(this);
             case VALUE_FRACTAL: return new ValueFractalNoise(this);
@@ -102,24 +99,24 @@ public class NoiseDescriptor {
         }
     }
 
-    private NoiseGenerator getCellularGenerator() {
+    private FastNoise getCellularGenerator() {
         switch (this.cellularReturn) {
-            case CELL_VALUE: return Cellular1EdgeNoise.cellValue(this);
-            case NOISE_LOOKUP: return Cellular1EdgeNoise.noiseLookup(this);
-            case DISTANCE: return Cellular1EdgeNoise.distance(this);
-            case DISTANCE2: return Cellular2EdgeNoise.distance(this);
-            case DISTANCE2_ADD: return Cellular2EdgeNoise.add(this);
-            case DISTANCE2_SUB: return Cellular2EdgeNoise.sub(this);
-            case DISTANCE2_MUL: return Cellular2EdgeNoise.mul(this);
-            case DISTANCE2_DIV: return Cellular2EdgeNoise.div(this);
-            case DISTANCE3_ADD: return Cellular3EdgeNoise.add(this);
-            case DISTANCE3_SUB: return Cellular3EdgeNoise.sub(this);
-            case DISTANCE3_MUL: return Cellular3EdgeNoise.mul(this);
-            default: return Cellular3EdgeNoise.div(this);
+            case CELL_VALUE: return new Cellular1EdgeNoise.CellValue(this);
+            case NOISE_LOOKUP: return new Cellular1EdgeNoise.NoiseLookup(this);
+            case DISTANCE: return new Cellular1EdgeNoise.Distance(this);
+            case DISTANCE2: return new Cellular2EdgeNoise.Distance(this);
+            case DISTANCE2_ADD: return new Cellular2EdgeNoise.Add(this);
+            case DISTANCE2_SUB: return new Cellular2EdgeNoise.Sub(this);
+            case DISTANCE2_MUL: return new Cellular2EdgeNoise.Mul(this);
+            case DISTANCE2_DIV: return new Cellular2EdgeNoise.Div(this);
+            case DISTANCE3_ADD: return new Cellular3EdgeNoise.Add(this);
+            case DISTANCE3_SUB: return new Cellular3EdgeNoise.Sub(this);
+            case DISTANCE3_MUL: return new Cellular3EdgeNoise.Mul(this);
+            default: return new Cellular3EdgeNoise.Div(this);
         }
     }
 
     public FastNoise generate() {
-        return new FastNoise(this.provider.apply(this));
+        return this.provider.apply(this);
     }
 }

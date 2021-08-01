@@ -1,12 +1,11 @@
 package personthecat.fastnoise.data;
 
 import org.jetbrains.annotations.Nullable;
-import personthecat.fastnoise.function.InterpolationFunction;
 import personthecat.fastnoise.util.EnumNamingService;
 
 import java.util.regex.Pattern;
 
-public enum InterpolationType implements InterpolationFunction {
+public enum InterpolationType {
     LINEAR {
         @Override
         public float interpolate(float a, float b) {
@@ -30,6 +29,8 @@ public enum InterpolationType implements InterpolationFunction {
 
     final Pattern pattern = EnumNamingService.createPattern(this);
     final String formatted = EnumNamingService.formatName(this);
+
+    public abstract float interpolate(final float a, final float b);
 
     @Nullable
     public static InterpolationType from(final String s) {

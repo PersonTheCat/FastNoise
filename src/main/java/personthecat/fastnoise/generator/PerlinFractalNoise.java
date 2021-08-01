@@ -1,7 +1,7 @@
 package personthecat.fastnoise.generator;
 
+import personthecat.fastnoise.data.FractalType;
 import personthecat.fastnoise.data.NoiseDescriptor;
-import personthecat.fastnoise.function.FractalFunction;
 
 import static personthecat.fastnoise.util.NoiseUtils.getFractalBounding;
 
@@ -13,9 +13,9 @@ public class PerlinFractalNoise extends PerlinNoise {
     private final float gain;
     private final int octaves;
     private final float fractalBounding;
-    private final FractalFunction fractal;
+    private final FractalType fractal;
 
-    public PerlinFractalNoise(final NoiseDescriptor cfg, final FractalFunction fractal) {
+    public PerlinFractalNoise(final NoiseDescriptor cfg, final FractalType fractal) {
         super(cfg);
         this.lacunarityX = cfg.lacunarityX();
         this.lacunarityY = cfg.lacunarityY();
@@ -31,9 +31,8 @@ public class PerlinFractalNoise extends PerlinNoise {
     }
 
     @Override
-    public float getNoise(float x, float y) {
-        int seed = this.seed;
-        float sum = this.fractal.apply(this.singlePerlin(seed, x, y));
+    public float getSingle(int seed, float x, float y) {
+        float sum = this.fractal.apply(super.getSingle(seed, x, y));
         float amp = 1;
 
         for (int i = 1; i < this.octaves; i++) {
@@ -41,15 +40,14 @@ public class PerlinFractalNoise extends PerlinNoise {
             y *= this.lacunarityY;
 
             amp *= this.gain;
-            sum += this.fractal.apply(this.singlePerlin(++seed, x, y)) * amp;
+            sum += this.fractal.apply(super.getSingle(++seed, x, y)) * amp;
         }
         return sum * this.fractalBounding;
     }
 
     @Override
-    public float getNoise(float x, float y, float z) {
-        int seed = this.seed;
-        float sum = this.fractal.apply(this.singlePerlin(++seed, x, y, z));
+    public float getSingle(int seed, float x, float y, float z) {
+        float sum = this.fractal.apply(super.getSingle(++seed, x, y, z));
         float amp = 1;
 
         for (int i = 1; i < this.octaves; i++) {
@@ -58,7 +56,7 @@ public class PerlinFractalNoise extends PerlinNoise {
             z *= this.lacunarityZ;
 
             amp *= this.gain;
-            sum += this.fractal.apply(this.singlePerlin(++seed, x, y, z)) * amp;
+            sum += this.fractal.apply(super.getSingle(++seed, x, y, z)) * amp;
         }
         return sum * this.fractalBounding;
     }

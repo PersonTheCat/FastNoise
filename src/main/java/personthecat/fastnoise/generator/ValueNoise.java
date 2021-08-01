@@ -7,28 +7,19 @@ import static personthecat.fastnoise.util.NoiseUtils.lerp;
 import static personthecat.fastnoise.util.NoiseUtils.value2;
 import static personthecat.fastnoise.util.NoiseUtils.value3;
 
-public class ValueNoise extends NoiseGenerator {
+public class ValueNoise extends FastNoise {
 
     public ValueNoise(NoiseDescriptor cfg) {
         super(cfg);
     }
 
     @Override
-    public float getNoise(float x) {
+    public float getSingle(int seed, float x) {
         return 0;
     }
 
     @Override
-    public float getNoise(float x, float y) {
-        return this.singleValue(this.seed, x, y);
-    }
-
-    @Override
-    public float getNoise(float x, float y, float z) {
-        return this.singleValue(this.seed, x, y, z);
-    }
-
-    public final float singleValue(final int seed, final float x, final float y) {
+    public float getSingle(final int seed, final float x, final float y) {
         int x0 = fastFloor(x);
         int y0 = fastFloor(y);
         int x1 = x0 + 1;
@@ -43,7 +34,8 @@ public class ValueNoise extends NoiseGenerator {
         return lerp(xf0, xf1, ys);
     }
 
-    public final float singleValue(final int seed, final float x, final float y, final float z) {
+    @Override
+    public float getSingle(final int seed, final float x, final float y, final float z) {
         int x0 = fastFloor(x);
         int y0 = fastFloor(y);
         int z0 = fastFloor(z);

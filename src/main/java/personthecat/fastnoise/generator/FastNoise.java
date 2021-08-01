@@ -2,12 +2,8 @@ package personthecat.fastnoise.generator;
 
 import personthecat.fastnoise.data.Float2;
 import personthecat.fastnoise.data.Float3;
+import personthecat.fastnoise.data.InterpolationType;
 import personthecat.fastnoise.data.NoiseDescriptor;
-import personthecat.fastnoise.function.InterpolationFunction;
-import personthecat.fastnoise.function.NoiseFunction1;
-import personthecat.fastnoise.function.NoiseFunction2;
-import personthecat.fastnoise.function.NoiseFunction3;
-import personthecat.fastnoise.function.NoiseWrapper;
 
 import static personthecat.fastnoise.util.NoiseTables.CELL_2D;
 import static personthecat.fastnoise.util.NoiseTables.CELL_3D;
@@ -16,10 +12,10 @@ import static personthecat.fastnoise.util.NoiseUtils.hash2;
 import static personthecat.fastnoise.util.NoiseUtils.hash3;
 import static personthecat.fastnoise.util.NoiseUtils.lerp;
 
-public abstract class NoiseGenerator implements NoiseWrapper {
+public abstract class FastNoise {
 
     protected final int seed;
-    protected final InterpolationFunction interpolation;
+    protected final InterpolationType interpolation;
     protected final float frequencyX;
     protected final float frequencyY;
     protected final float frequencyZ;
@@ -27,9 +23,13 @@ public abstract class NoiseGenerator implements NoiseWrapper {
     protected final boolean gradientPerturb;
     protected final float gradientPerturbAmplitude;
     protected final float gradientPerturbFrequency;
-    protected final int hashCode;
+    protected final float scaleAmplitude;
+    protected final float scaleOffset;
+    protected final float minThreshold;
+    protected final float maxThreshold;
+    protected final boolean invert;
 
-    public NoiseGenerator(final NoiseDescriptor cfg) {
+    public FastNoise(final NoiseDescriptor cfg) {
         this.seed = cfg.seed();
         this.interpolation = cfg.interpolation();
         this.frequencyX = cfg.frequencyX();
@@ -39,40 +39,76 @@ public abstract class NoiseGenerator implements NoiseWrapper {
         this.gradientPerturb = cfg.gradientPerturb();
         this.gradientPerturbAmplitude = cfg.gradientPerturbAmplitude();
         this.gradientPerturbFrequency = cfg.gradientPerturbFrequency();
-        this.hashCode = cfg.hashCode();
+        this.scaleAmplitude = cfg.scaleAmplitude();
+        this.scaleOffset = cfg.scaleOffset();
+        this.minThreshold = cfg.minThreshold();
+        this.maxThreshold = cfg.maxThreshold();
+        this.invert = cfg.invert();
     }
 
-    public abstract float getNoise(final float x);
-
-    public abstract float getNoise(final float x, final float y);
-
-    public abstract float getNoise(final float x, final float y, final float z);
-
-    // Could theoretically modify these -- e.g. generate code to optimize.
-    @Override
-    public NoiseFunction1 wrapNoise1() {
-        return x -> this.getNoise(this.frequencyX * x);
+    public static NoiseDescriptor createDescriptor() {
+        return new NoiseDescriptor();
     }
 
-    @Override
-    public NoiseFunction2 wrapNoise2() {
+    public abstract float getSingle(final int seed, final float x);
+
+    public abstract float getSingle(final int seed, final float x, final float y);
+
+    public abstract float getSingle(final int seed, final float x, final float y, final float z);
+
+    public float getNoise(float x) {
+        return this.getSingle(this.seed, x * this.frequencyX);
+    }
+
+    public float getNoise(float x, float y) {
+        x *= this.frequencyX;
+        y *= this.frequencyY;
+
         if (this.gradientPerturb) {
-            return (x, y) -> this.perturb(x * this.frequencyX, y * this.frequencyY);
+            return this.perturb(this.seed, x, y);
         }
-        return (x, y) -> this.getNoise(x * this.frequencyX, y * this.frequencyY);
+        return this.getSingle(this.seed, x, y);
     }
 
-    @Override
-    public NoiseFunction3 wrapNoise3() {
+    public float getNoise(float x, float y, float z) {
+        x *= this.frequencyX;
+        y = y * this.frequencyY + this.offset;
+        z *= this.frequencyZ;
+
         if (this.gradientPerturb) {
-            return (x, y, z) ->
-                this.perturb(x * this.frequencyX, (y + this.offset) * this.frequencyY, z * this.frequencyZ);
+            return this.perturb(this.seed, x, y, z);
         }
-        return (x, y, z) ->
-            this.getNoise(x * this.frequencyX,  (y + this.offset) * this.frequencyY, z * this.frequencyZ);
+        return this.getSingle(this.seed, x, y, z);
     }
 
-    protected float perturb(float x, float y) {
+    public float getNoiseScaled(final float x) {
+        return this.getNoise(x) * this.scaleAmplitude + this.scaleOffset;
+    }
+
+    public float getNoiseScaled(final float x, final float y) {
+        return this.getNoise(x, y) * this.scaleAmplitude + this.scaleOffset;
+    }
+
+    public float getNoiseScaled(final float x, final float y, final float z) {
+        return this.getNoise(x, y, z) * this.scaleAmplitude + this.scaleOffset;
+    }
+
+    public boolean getBoolean(final float x) {
+        final float noise = this.getNoise(x);
+        return this.invert != (noise > this.minThreshold && noise < this.maxThreshold);
+    }
+
+    public boolean getBoolean(final float x, final float y) {
+        final float noise = this.getNoise(x, y);
+        return this.invert != (noise > this.minThreshold && noise < this.maxThreshold);
+    }
+
+    public boolean getBoolean(final float x, final float y, final float z) {
+        final float noise = this.getNoise(x, y, z);
+        return this.invert != (noise > this.minThreshold && noise < this.maxThreshold);
+    }
+
+    protected float perturb(int seed, float x, float y) {
         final float xf = x * this.gradientPerturbFrequency;
         final float yf = y * this.gradientPerturbFrequency;
 
@@ -98,10 +134,10 @@ public abstract class NoiseGenerator implements NoiseWrapper {
 
         x += lerp(lx0x, lx1x, ys) * this.gradientPerturbAmplitude;
         y += lerp(ly0x, ly1x, ys) * this.gradientPerturbAmplitude;
-        return this.getNoise(x, y);
+        return this.getSingle(seed, x, y);
     }
 
-    protected float perturb(float x, float y, float z) {
+    protected float perturb(int seed, float x, float y, float z) {
         final float xf = x * this.gradientPerturbFrequency;
         final float yf = y * this.gradientPerturbFrequency;
         final float zf = z * this.gradientPerturbFrequency;
@@ -152,6 +188,6 @@ public abstract class NoiseGenerator implements NoiseWrapper {
         x += lerp(lx0y, lerp(lx0x, lx1x, ys), zs) * this.gradientPerturbAmplitude;
         y += lerp(ly0y, lerp(ly0x, ly1x, ys), zs) * this.gradientPerturbAmplitude;
         z += lerp(lz0y, lerp(lz0x, lz1x, ys), zs) * this.gradientPerturbAmplitude;
-        return this.getNoise(x, y, z);
+        return this.getSingle(seed, x, y, z);
     }
 }

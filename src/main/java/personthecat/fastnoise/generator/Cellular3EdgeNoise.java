@@ -1,12 +1,9 @@
 package personthecat.fastnoise.generator;
 
-import personthecat.fastnoise.data.Cellular3EdgeCustomizer;
+import personthecat.fastnoise.data.CellularDistanceType;
 import personthecat.fastnoise.data.Float2;
 import personthecat.fastnoise.data.Float3;
 import personthecat.fastnoise.data.NoiseDescriptor;
-import personthecat.fastnoise.function.DistanceFunction2;
-import personthecat.fastnoise.function.DistanceFunction3;
-import personthecat.fastnoise.function.ReturnFunction3Edge;
 
 import static personthecat.fastnoise.util.NoiseTables.CELL_2D;
 import static personthecat.fastnoise.util.NoiseTables.CELL_3D;
@@ -14,56 +11,40 @@ import static personthecat.fastnoise.util.NoiseUtils.fastRound;
 import static personthecat.fastnoise.util.NoiseUtils.hash2;
 import static personthecat.fastnoise.util.NoiseUtils.hash3;
 
-public class Cellular3EdgeNoise extends NoiseGenerator {
+public abstract class Cellular3EdgeNoise extends FastNoise {
 
-    private final DistanceFunction2 distance2;
-    private final DistanceFunction3 distance3;
-    private final ReturnFunction3Edge return3;
+    private final CellularDistanceType distance;
     private final float jitterX;
     private final float jitterY;
     private final float jitterZ;
 
-    public Cellular3EdgeNoise(final NoiseDescriptor cfg, final Cellular3EdgeCustomizer functions) {
+    public Cellular3EdgeNoise(final NoiseDescriptor cfg) {
         super(cfg);
-        this.distance2 = functions.distance2();
-        this.distance3 = functions.distance3();
-        this.return3 = functions.return3();
+        this.distance = cfg.distance();
         this.jitterX = cfg.jitterX();
         this.jitterY = cfg.jitterY();
         this.jitterZ = cfg.jitterZ();
     }
 
-    public static Cellular3EdgeNoise distance(final NoiseDescriptor cfg) {
-        return withReturn(cfg, (d1, d2, d3) -> d3 - 1);
+    public static Cellular3EdgeNoise create(final NoiseDescriptor cfg) {
+        switch (cfg.cellularReturn()) {
+            case DISTANCE3_ADD: return new Add(cfg);
+            case DISTANCE3_SUB: return new Sub(cfg);
+            case DISTANCE3_MUL: return new Mul(cfg);
+            case DISTANCE3_DIV: return new Div(cfg);
+            default: return new Distance(cfg);
+        }
     }
 
-    public static Cellular3EdgeNoise add(final NoiseDescriptor cfg) {
-        return withReturn(cfg, (d1, d2, d3) -> d3 + d1 - 1);
-    }
-
-    public static Cellular3EdgeNoise sub(final NoiseDescriptor cfg) {
-        return withReturn(cfg, (d1, d2, d3) -> d3 - d1 - 1);
-    }
-
-    public static Cellular3EdgeNoise mul(final NoiseDescriptor cfg) {
-        return withReturn(cfg, (d1, d2, d3) -> d3 * d1 - 1);
-    }
-
-    public static Cellular3EdgeNoise div(final NoiseDescriptor cfg) {
-        return withReturn(cfg, (d1, d2, d3) -> d1 / d3 - 1);
-    }
-
-    public static Cellular3EdgeNoise withReturn(final NoiseDescriptor cfg, final ReturnFunction3Edge return3) {
-        return new Cellular3EdgeNoise(cfg, new Cellular3EdgeCustomizer(cfg.distance()).return3(return3));
-    }
+    public abstract float getReturn(final float distance, final float distance2, final float distance3);
 
     @Override
-    public float getNoise(float x) {
+    public float getSingle(int seed, float x) {
         return 0;
     }
 
     @Override
-    public float getNoise(float x, float y) {
+    public float getSingle(int seed, float x, float y) {
         int xr = fastRound(x);
         int yr = fastRound(y);
 
@@ -73,24 +54,23 @@ public class Cellular3EdgeNoise extends NoiseGenerator {
 
         for (int xi = xr - 1; xi <= xr + 1; xi++) {
             for (int yi = yr - 1; yi <= yr + 1; yi++) {
-                Float2 vec = CELL_2D[hash2(this.seed, xi, yi) & 255];
+                Float2 vec = CELL_2D[hash2(seed, xi, yi) & 255];
 
                 float vecX = xi - x + vec.x * this.jitterX;
                 float vecY = yi - y + vec.y * this.jitterY;
 
-                float newDistance = this.distance2.getDistance(vecX, vecY);
+                float newDistance = this.distance.getDistance(vecX, vecY);
 
                 distance3 = Math.max(Math.min(distance3, newDistance), distance2);
                 distance2 = Math.max(Math.min(distance2, newDistance), distance);
                 distance = Math.min(distance, newDistance);
             }
         }
-
-        return this.return3.getReturn(distance, distance2, distance3);
+        return this.getReturn(distance, distance2, distance3);
     }
 
     @Override
-    public float getNoise(float x, float y, float z) {
+    public float getSingle(int seed, float x, float y, float z) {
         int xr = fastRound(x);
         int yr = fastRound(y);
         int zr = fastRound(z);
@@ -102,13 +82,13 @@ public class Cellular3EdgeNoise extends NoiseGenerator {
         for (int xi = xr - 1; xi <= xr + 1; xi++) {
             for (int yi = yr - 1; yi <= yr + 1; yi++) {
                 for (int zi = zr - 1; zi <= zr + 1; zi++) {
-                    Float3 vec = CELL_3D[hash3(this.seed, xi, yi, zi) & 255];
+                    Float3 vec = CELL_3D[hash3(seed, xi, yi, zi) & 255];
 
                     float vecX = xi - x + vec.x * this.jitterX;
                     float vecY = yi - y + vec.y * this.jitterY;
                     float vecZ = zi - z + vec.z * this.jitterZ;
 
-                    float newDistance = this.distance3.getDistance(vecX, vecY, vecZ);
+                    float newDistance = this.distance.getDistance(vecX, vecY, vecZ);
 
                     distance3 = Math.max(Math.min(distance3, newDistance), distance2);
                     distance2 = Math.max(Math.min(distance2, newDistance), distance);
@@ -116,7 +96,66 @@ public class Cellular3EdgeNoise extends NoiseGenerator {
                 }
             }
         }
+        return this.getReturn(distance, distance2, distance3);
+    }
 
-        return this.return3.getReturn(distance, distance2, distance3);
+    public static class Distance extends Cellular3EdgeNoise {
+
+        public Distance(final NoiseDescriptor cfg) {
+            super(cfg);
+        }
+
+        @Override
+        public float getReturn(final float distance, final float distance2, final float distance3) {
+            return distance3 - 1;
+        }
+    }
+
+    public static class Add extends Cellular3EdgeNoise {
+
+        public Add(final NoiseDescriptor cfg) {
+            super(cfg);
+        }
+
+        @Override
+        public float getReturn(final float distance, final float distance2, final float distance3) {
+            return distance3 + distance - 1;
+        }
+    }
+
+    public static class Sub extends Cellular3EdgeNoise {
+
+        public Sub(final NoiseDescriptor cfg) {
+            super(cfg);
+        }
+
+        @Override
+        public float getReturn(final float distance, final float distance2, final float distance3) {
+            return distance3 - distance - 1;
+        }
+    }
+
+    public static class Mul extends Cellular3EdgeNoise {
+
+        public Mul(final NoiseDescriptor cfg) {
+            super(cfg);
+        }
+
+        @Override
+        public float getReturn(final float distance, final float distance2, final float distance3) {
+            return distance3 * distance - 1;
+        }
+    }
+
+    public static class Div extends Cellular3EdgeNoise {
+
+        public Div(final NoiseDescriptor cfg) {
+            super(cfg);
+        }
+
+        @Override
+        public float getReturn(final float distance, final float distance2, final float distance3) {
+            return distance / distance3 - 1;
+        }
     }
 }

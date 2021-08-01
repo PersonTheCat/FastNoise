@@ -1,13 +1,11 @@
 package personthecat.fastnoise.data;
 
 import org.jetbrains.annotations.Nullable;
-import personthecat.fastnoise.function.DistanceFunction2;
-import personthecat.fastnoise.function.DistanceFunction3;
 import personthecat.fastnoise.util.EnumNamingService;
 
 import java.util.regex.Pattern;
 
-public enum CellularDistanceType implements DistanceFunction2, DistanceFunction3 {
+public enum CellularDistanceType {
     EUCLIDEAN {
         @Override
         public float getDistance(float x, float y) {
@@ -44,6 +42,9 @@ public enum CellularDistanceType implements DistanceFunction2, DistanceFunction3
 
     final Pattern pattern = EnumNamingService.createPattern(this);
     final String formatted = EnumNamingService.formatName(this);
+
+    public abstract float getDistance(final float x, final float y);
+    public abstract float getDistance(final float x, final float y, final float z);
 
     @Nullable
     public static CellularDistanceType from(final String s) {

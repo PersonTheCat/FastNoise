@@ -1,6 +1,7 @@
 package personthecat.fastnoise;
 
 import personthecat.fastnoise.data.*;
+import personthecat.fastnoise.generator.FastNoise;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -60,7 +61,8 @@ public class PerformanceTest {
 
         FastNoise createNewGenerator() {
             return FastNoise.createDescriptor()
-                .noise(this.randomEnum(NoiseType.class))
+                .noise(NoiseType.SIMPLEX)
+//                .noise(this.randomEnum(NoiseType.class))
                 .fractal(this.randomEnum(FractalType.class))
                 .interpolation(this.randomEnum(InterpolationType.class))
                 .distance(this.randomEnum(CellularDistanceType.class))
@@ -71,7 +73,7 @@ public class PerformanceTest {
                 .lacunarity(RAND.nextFloat())
                 .gain(RAND.nextFloat())
                 .jitter(RAND.nextFloat())
-                .gradientPerturb(RAND.nextBoolean())
+//                .gradientPerturb(RAND.nextBoolean())
                 .gradientPerturbAmplitude(RAND.nextFloat())
                 .gradientPerturbFrequency(RAND.nextFloat())
                 .offset(RAND.nextInt())
@@ -83,7 +85,8 @@ public class PerformanceTest {
 
         OriginalFastNoise createOldGenerator() {
             return new OriginalFastNoise(RAND.nextInt())
-                .SetNoiseType(this.randomEnum(OriginalFastNoise.NoiseType.class))
+                .SetNoiseType(OriginalFastNoise.NoiseType.Simplex)
+//                .SetNoiseType(this.randomEnum(OriginalFastNoise.NoiseType.class))
                 .SetFractalType(this.randomEnum(OriginalFastNoise.FractalType.class))
                 .SetInterp(this.randomEnum(OriginalFastNoise.Interp.class))
                 .SetCellularDistanceFunction(this.randomEnum(OriginalFastNoise.CellularDistanceFunction.class))
@@ -94,7 +97,7 @@ public class PerformanceTest {
                 .SetFractalLacunarity(RAND.nextFloat())
                 .SetFractalGain(RAND.nextFloat())
                 .SetCellularJitter(RAND.nextFloat())
-                .SetGradientPerturb(RAND.nextBoolean())
+//                .SetGradientPerturb(RAND.nextBoolean())
                 .SetGradientPerturbAmp(RAND.nextFloat())
                 .SetGradientPerturbFrequency(RAND.nextFloat())
                 .SetOffset(RAND.nextInt())

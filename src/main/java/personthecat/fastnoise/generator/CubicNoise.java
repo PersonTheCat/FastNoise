@@ -7,31 +7,22 @@ import static personthecat.fastnoise.util.NoiseUtils.fastFloor;
 import static personthecat.fastnoise.util.NoiseUtils.value2;
 import static personthecat.fastnoise.util.NoiseUtils.value3;
 
-public class CubicNoise extends NoiseGenerator {
+public class CubicNoise extends FastNoise {
 
     private final static float CUBIC_2D_BOUNDING = 1 / (float) (1.5 * 1.5);
     private final static float CUBIC_3D_BOUNDING = 1 / (float) (1.5 * 1.5 * 1.5);
 
-    public CubicNoise(NoiseDescriptor cfg) {
+    public CubicNoise(final NoiseDescriptor cfg) {
         super(cfg);
     }
 
     @Override
-    public float getNoise(final float x) {
+    public float getSingle(final int seed, final float x) {
         return 0;
     }
 
     @Override
-    public float getNoise(final float x, final float y) {
-        return this.singleCubic(this.seed, x, y);
-    }
-
-    @Override
-    public float getNoise(final float x, final float y, final float z) {
-        return this.singleCubic(this.seed, x, y, z);
-    }
-
-    public final float singleCubic(final int seed, final float x, final float y) {
+    public float getSingle(final int seed, final float x, final float y) {
         int x1 = fastFloor(x);
         int y1 = fastFloor(y);
 
@@ -54,7 +45,8 @@ public class CubicNoise extends NoiseGenerator {
         ) * CUBIC_2D_BOUNDING;
     }
 
-    public final float singleCubic(final int seed, final float x, final float y, final float z) {
+    @Override
+    public float getSingle(final int seed, final float x, final float y, final float z) {
         int x1 = fastFloor(x);
         int y1 = fastFloor(y);
         int z1 = fastFloor(z);

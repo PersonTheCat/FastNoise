@@ -6,7 +6,7 @@ import static personthecat.fastnoise.util.NoiseUtils.fastFloor;
 import static personthecat.fastnoise.util.NoiseUtils.gradient2;
 import static personthecat.fastnoise.util.NoiseUtils.gradient3;
 
-public class SimplexNoise extends NoiseGenerator {
+public class SimplexNoise extends FastNoise {
 
     private final static float F2 = (float) (1.0 / 2.0);
     private final static float G2 = (float) (1.0 / 4.0);
@@ -19,21 +19,12 @@ public class SimplexNoise extends NoiseGenerator {
     }
 
     @Override
-    public float getNoise(float x) {
+    public float getSingle(int seed, float x) {
         return 0;
     }
 
     @Override
-    public float getNoise(float x, float y) {
-        return this.singleSimplex(this.seed, x, y);
-    }
-
-    @Override
-    public float getNoise(final float x, final float y, final float z) {
-        return this.singleSimplex(this.seed, x, y, z);
-    }
-
-    public final float singleSimplex(final int seed, final float x, final float y) {
+    public float getSingle(final int seed, final float x, final float y) {
         float t = (x + y) * F2;
         int i = fastFloor(x + t);
         int j = fastFloor(y + t);
@@ -85,7 +76,8 @@ public class SimplexNoise extends NoiseGenerator {
         return 50 * (n0 + n1 + n2);
     }
 
-    public final float singleSimplex(final int seed, final float x, final float y, final float z) {
+    @Override
+    public float getSingle(final int seed, final float x, final float y, final float z) {
         float t = (x + y + z) * F3;
         int i = fastFloor(x + t);
         int j = fastFloor(y + t);

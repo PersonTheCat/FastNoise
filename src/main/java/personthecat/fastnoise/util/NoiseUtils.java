@@ -19,6 +19,14 @@ public class NoiseUtils {
         return (f >= 0) ? (int) (f + (float) 0.5) : (int) (f - (float) 0.5);
     }
 
+    public static float interpolateHermite(float t) {
+        return t * t * (3 - 2 * t);
+    }
+
+    public static float interpolateQuintic(float t) {
+        return t * t * t * (t * (t * 6 - 15) + 10);
+    }
+
     public static float lerp(final float a, final float b, final float t) {
         return a + t * (b - a);
     }

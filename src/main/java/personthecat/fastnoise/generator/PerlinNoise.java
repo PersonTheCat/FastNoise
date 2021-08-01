@@ -2,11 +2,8 @@ package personthecat.fastnoise.generator;
 
 import personthecat.fastnoise.data.NoiseDescriptor;
 
-import static personthecat.fastnoise.util.NoiseUtils.fastFloor;
-import static personthecat.fastnoise.util.NoiseUtils.gradient2;
-import static personthecat.fastnoise.util.NoiseUtils.gradient3;
-import static personthecat.fastnoise.util.NoiseUtils.lerp;
-import static personthecat.fastnoise.util.NoiseUtils.value1;
+import static personthecat.fastnoise.util.NoiseUtils.*;
+import static personthecat.fastnoise.util.NoiseUtils.interpolateQuintic;
 
 public class PerlinNoise extends FastNoise {
 
@@ -17,7 +14,19 @@ public class PerlinNoise extends FastNoise {
     @Override
     public final float getSingle(final int seed, float x) {
         x -= fastFloor(x);
-        float u = this.interpolation.interpolate(x, 0);
+
+        final float u;
+        switch (this.interpolation) {
+            case LINEAR:
+                u = x;
+                break;
+            case HERMITE:
+                u = interpolateHermite(x);
+                break;
+            default:
+                u = interpolateQuintic(x);
+        }
+
         float gradA = value1(seed, x);
         float gradB = value1(seed + 1, x - 1);
         return lerp(u, gradA, gradB);
@@ -30,8 +39,20 @@ public class PerlinNoise extends FastNoise {
         final int x1 = x0 + 1;
         final int y1 = y0 + 1;
 
-        final float xs = this.interpolation.interpolate(x, x0);
-        final float ys = this.interpolation.interpolate(y, y0);
+        final float xs, ys;
+        switch (this.interpolation) {
+            case LINEAR:
+                xs = x - x0;
+                ys = y - y0;
+                break;
+            case HERMITE:
+                xs = interpolateHermite(x - x0);
+                ys = interpolateHermite(y - y0);
+                break;
+            default:
+                xs = interpolateQuintic(x - x0);
+                ys = interpolateQuintic(y - y0);
+        }
 
         final float xd0 = x - x0;
         final float yd0 = y - y0;
@@ -53,9 +74,23 @@ public class PerlinNoise extends FastNoise {
         final int y1 = y0 + 1;
         final int z1 = z0 + 1;
 
-        final float xs = this.interpolation.interpolate(x, x0);
-        final float ys = this.interpolation.interpolate(y, y0);
-        final float zs = this.interpolation.interpolate(z, z0);
+        final float xs, ys, zs;
+        switch (this.interpolation) {
+            case LINEAR:
+                xs = x - x0;
+                ys = y - y0;
+                zs = z - z0;
+                break;
+            case HERMITE:
+                xs = interpolateHermite(x - x0);
+                ys = interpolateHermite(y - y0);
+                zs = interpolateHermite(z - z0);
+                break;
+            default:
+                xs = interpolateQuintic(x - x0);
+                ys = interpolateQuintic(y - y0);
+                zs = interpolateQuintic(z - z0);
+        }
 
         final float xd0 = x - x0;
         final float yd0 = y - y0;

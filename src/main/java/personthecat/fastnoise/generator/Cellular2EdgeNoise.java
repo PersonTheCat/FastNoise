@@ -50,20 +50,53 @@ public abstract class Cellular2EdgeNoise extends FastNoise {
 
         float distance = 999999;
         float distance2 = 999999;
+        switch (this.distance) {
+            case EUCLIDEAN:
+                for (int xi = xr - 1; xi <= xr + 1; xi++) {
+                    for (int yi = yr - 1; yi <= yr + 1; yi++) {
+                        Float2 vec = CELL_2D[hash2(seed, xi, yi) & 255];
 
-        for (int xi = xr - 1; xi <= xr + 1; xi++) {
-            for (int yi = yr - 1; yi <= yr + 1; yi++) {
-                Float2 vec = CELL_2D[hash2(seed, xi, yi) & 255];
+                        float vecX = xi - x + vec.x * this.jitterX;
+                        float vecY = yi - y + vec.y * this.jitterY;
 
-                float vecX = xi - x + vec.x * this.jitterX;
-                float vecY = yi - y + vec.y * this.jitterY;
+                        float newDistance = vecX * vecX + vecY * vecY;
 
-                float newDistance = this.distance.getDistance(vecX, vecY);
+                        distance2 = Math.max(Math.min(distance2, newDistance), distance);
+                        distance = Math.min(distance, newDistance);
+                    }
+                }
+                break;
+            case MANHATTAN:
+                for (int xi = xr - 1; xi <= xr + 1; xi++) {
+                    for (int yi = yr - 1; yi <= yr + 1; yi++) {
+                        Float2 vec = CELL_2D[hash2(seed, xi, yi) & 255];
 
-                distance2 = Math.max(Math.min(distance2, newDistance), distance);
-                distance = Math.min(distance, newDistance);
-            }
+                        float vecX = xi - x + vec.x * this.jitterX;
+                        float vecY = yi - y + vec.y * this.jitterY;
+
+                        float newDistance = Math.abs(vecX) + Math.abs(vecY);
+
+                        distance2 = Math.max(Math.min(distance2, newDistance), distance);
+                        distance = Math.min(distance, newDistance);
+                    }
+                }
+                break;
+            default:
+                for (int xi = xr - 1; xi <= xr + 1; xi++) {
+                    for (int yi = yr - 1; yi <= yr + 1; yi++) {
+                        Float2 vec = CELL_2D[hash2(seed, xi, yi) & 255];
+
+                        float vecX = xi - x + vec.x * this.jitterX;
+                        float vecY = yi - y + vec.y * this.jitterY;
+
+                        float newDistance = Math.abs(vecX) + Math.abs(vecY) + vecX * vecX + vecY * vecY;
+
+                        distance2 = Math.max(Math.min(distance2, newDistance), distance);
+                        distance = Math.min(distance, newDistance);
+                    }
+                }
         }
+
         return this.getReturn(distance, distance2);
     }
 
@@ -75,23 +108,46 @@ public abstract class Cellular2EdgeNoise extends FastNoise {
 
         float distance = 999999;
         float distance2 = 999999;
+        switch (this.distance) {
+            case EUCLIDEAN:
+                for (int xi = xr - 1; xi <= xr + 1; xi++) {
+                    for (int yi = yr - 1; yi <= yr + 1; yi++) {
+                        for (int zi = zr - 1; zi <= zr + 1; zi++) {
+                            Float3 vec = CELL_3D[hash3(seed, xi, yi, zi) & 255];
 
-        for (int xi = xr - 1; xi <= xr + 1; xi++) {
-            for (int yi = yr - 1; yi <= yr + 1; yi++) {
-                for (int zi = zr - 1; zi <= zr + 1; zi++) {
-                    Float3 vec = CELL_3D[hash3(seed, xi, yi, zi) & 255];
+                            float vecX = xi - x + vec.x * this.jitterX;
+                            float vecY = yi - y + vec.y * this.jitterY;
+                            float vecZ = zi - z + vec.z * this.jitterZ;
 
-                    float vecX = xi - x + vec.x * this.jitterX;
-                    float vecY = yi - y + vec.y * this.jitterY;
-                    float vecZ = zi - z + vec.z * this.jitterZ;
+                            float newDistance = vecX * vecX + vecY * vecY + vecZ * vecZ;
 
-                    float newDistance = this.distance.getDistance(vecX, vecY, vecZ);
-
-                    distance2 = Math.max(Math.min(distance2, newDistance), distance);
-                    distance = Math.min(distance, newDistance);
+                            distance2 = Math.max(Math.min(distance2, newDistance), distance);
+                            distance = Math.min(distance, newDistance);
+                        }
+                    }
                 }
-            }
+                break;
+            case MANHATTAN:
+                for (int xi = xr - 1; xi <= xr + 1; xi++) {
+                    for (int yi = yr - 1; yi <= yr + 1; yi++) {
+                        for (int zi = zr - 1; zi <= zr + 1; zi++) {
+                            Float3 vec = CELL_3D[hash3(seed, xi, yi, zi) & 255];
+
+                            float vecX = xi - x + vec.x * this.jitterX;
+                            float vecY = yi - y + vec.y * this.jitterY;
+                            float vecZ = zi - z + vec.z * this.jitterZ;
+
+                            float newDistance = Math.abs(vecX) + Math.abs(vecY) + Math.abs(vecZ);
+
+                            distance2 = Math.max(Math.min(distance2, newDistance), distance);
+                            distance = Math.min(distance, newDistance);
+                        }
+                    }
+                }
+                break;
+            default:
         }
+
         return this.getReturn(distance, distance2);
     }
 

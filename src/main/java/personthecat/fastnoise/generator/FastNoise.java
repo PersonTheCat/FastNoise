@@ -10,6 +10,8 @@ import static personthecat.fastnoise.util.NoiseTables.CELL_3D;
 import static personthecat.fastnoise.util.NoiseUtils.fastFloor;
 import static personthecat.fastnoise.util.NoiseUtils.hash2;
 import static personthecat.fastnoise.util.NoiseUtils.hash3;
+import static personthecat.fastnoise.util.NoiseUtils.interpolateHermite;
+import static personthecat.fastnoise.util.NoiseUtils.interpolateQuintic;
 import static personthecat.fastnoise.util.NoiseUtils.lerp;
 
 public abstract class FastNoise {
@@ -117,8 +119,20 @@ public abstract class FastNoise {
         final int x1 = x0 + 1;
         final int y1 = y0 + 1;
 
-        final float xs = this.interpolation.interpolate(xf, x0);
-        final float ys = this.interpolation.interpolate(yf, y0);
+        final float xs, ys;
+        switch (this.interpolation) {
+            case LINEAR:
+                xs = xf - x0;
+                ys = yf - y0;
+                break;
+            case HERMITE:
+                xs = interpolateHermite(xf - x0);
+                ys = interpolateHermite(yf - y0);
+                break;
+            default:
+                xs = interpolateQuintic(xf - x0);
+                ys = interpolateQuintic(yf - y0);
+        }
 
         Float2 vec0 = CELL_2D[hash2(this.seed, x0, y0) & 255];
         Float2 vec1 = CELL_2D[hash2(this.seed, x1, y0) & 255];
@@ -149,9 +163,23 @@ public abstract class FastNoise {
         final int y1 = y0 + 1;
         final int z1 = z0 + 1;
 
-        final float xs = this.interpolation.interpolate(xf, x0);
-        final float ys = this.interpolation.interpolate(yf, y0);
-        final float zs = this.interpolation.interpolate(zf, z0);
+        final float xs, ys, zs;
+        switch (this.interpolation) {
+            case LINEAR:
+                xs = xf - x0;
+                ys = yf - y0;
+                zs = zf - z0;
+                break;
+            case HERMITE:
+                xs = interpolateHermite(xf - x0);
+                ys = interpolateHermite(yf - y0);
+                zs = interpolateHermite(zf - z0);
+                break;
+            default:
+                xs = interpolateQuintic(xf - x0);
+                ys = interpolateQuintic(yf - y0);
+                zs = interpolateQuintic(zf - z0);
+        }
 
         Float3 vec0 = CELL_3D[hash3(this.seed, x0, y0, z0) & 255];
         Float3 vec1 = CELL_3D[hash3(this.seed, x1, y0, z0) & 255];

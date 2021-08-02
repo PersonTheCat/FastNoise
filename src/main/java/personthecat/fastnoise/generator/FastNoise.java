@@ -52,6 +52,10 @@ public abstract class FastNoise {
         return new NoiseDescriptor();
     }
 
+    public static DummyNoiseWrapper createWrapper() {
+        return new DummyNoiseWrapper();
+    }
+
     public abstract float getSingle(final int seed, final float x);
 
     public abstract float getSingle(final int seed, final float x, final float y);

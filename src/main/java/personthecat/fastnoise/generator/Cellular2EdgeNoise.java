@@ -147,6 +147,22 @@ public abstract class Cellular2EdgeNoise extends FastNoise {
                 }
                 break;
             default:
+                for (int xi = xr - 1; xi <= xr + 1; xi++) {
+                    for (int yi = yr - 1; yi <= yr + 1; yi++) {
+                        for (int zi = zr - 1; zi <= zr + 1; zi++) {
+                            Float3 vec = CELL_3D[hash3(seed, xi, yi, zi) & 255];
+
+                            float vecX = xi - x + vec.x * this.jitterX;
+                            float vecY = yi - y + vec.y * this.jitterY;
+                            float vecZ = zi - z + vec.z * this.jitterZ;
+
+                            float newDistance = Math.abs(vecX) + Math.abs(vecY) + Math.abs(vecZ) + vecX * vecX + vecY * vecY + vecZ * vecZ;
+
+                            distance2 = Math.max(Math.min(distance2, newDistance), distance);
+                            distance = Math.min(distance, newDistance);
+                        }
+                    }
+                }
         }
 
         return this.getReturn(distance, distance2);

@@ -64,13 +64,11 @@ public class PerformanceTest {
 
         FastNoise createNewGenerator() {
             return FastNoise.createDescriptor()
-//                .noise(NoiseType.CELLULAR)
                 .noise(this.randomEnum(NoiseType.class))
                 .fractal(this.randomEnum(FractalType.class))
                 .interpolation(this.randomEnum(InterpolationType.class))
                 .distance(this.randomEnum(CellularDistanceType.class))
                 .cellularReturn(this.randomEnum(CellularReturnType.class))
-//                .cellularReturn(CellularReturnType.DISTANCE)
                 .seed(RAND.nextInt())
                 .frequency(RAND.nextFloat())
                 .octaves(RAND.nextInt(MAX_OCTAVES) + 1)
@@ -89,13 +87,11 @@ public class PerformanceTest {
 
         OriginalFastNoise createOldGenerator() {
             return new OriginalFastNoise(RAND.nextInt())
-//                .SetNoiseType(OriginalFastNoise.NoiseType.Cellular)
                 .SetNoiseType(this.randomEnum(OriginalFastNoise.NoiseType.class))
                 .SetFractalType(this.randomEnum(OriginalFastNoise.FractalType.class))
                 .SetInterp(this.randomEnum(OriginalFastNoise.Interp.class))
                 .SetCellularDistanceFunction(this.randomEnum(OriginalFastNoise.CellularDistanceFunction.class))
                 .SetCellularReturnType(this.randomEnum(OriginalFastNoise.CellularReturnType.class))
-//                .SetCellularReturnType(OriginalFastNoise.CellularReturnType.Distance)
                 .SetCellularNoiseLookup(new OriginalFastNoise())
                 .SetFrequency(RAND.nextFloat())
                 .SetFractalOctaves(RAND.nextInt(MAX_OCTAVES) + 1)

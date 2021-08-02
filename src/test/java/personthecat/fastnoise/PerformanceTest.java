@@ -5,7 +5,6 @@ import personthecat.fastnoise.data.InterpolationType;
 import personthecat.fastnoise.data.NoiseType;
 import personthecat.fastnoise.data.CellularDistanceType;
 import personthecat.fastnoise.data.CellularReturnType;
-import personthecat.fastnoise.generator.FastNoise;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

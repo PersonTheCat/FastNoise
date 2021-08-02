@@ -1,5 +1,6 @@
 package personthecat.fastnoise.generator;
 
+import personthecat.fastnoise.FastNoise;
 import personthecat.fastnoise.data.NoiseDescriptor;
 
 import static personthecat.fastnoise.util.NoiseUtils.cubicLerp;

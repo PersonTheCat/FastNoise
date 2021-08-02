@@ -3,6 +3,7 @@ package personthecat.fastnoise.generator;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import personthecat.fastnoise.FastNoise;
 import personthecat.fastnoise.data.NoiseDescriptor;
 import personthecat.fastnoise.function.NoiseFunction1;
 import personthecat.fastnoise.function.NoiseFunction2;

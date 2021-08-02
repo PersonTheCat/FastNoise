@@ -1,7 +1,7 @@
 package personthecat.fastnoise.function;
 
 import personthecat.fastnoise.data.NoiseDescriptor;
-import personthecat.fastnoise.generator.FastNoise;
+import personthecat.fastnoise.FastNoise;
 
 import java.util.function.Function;
 

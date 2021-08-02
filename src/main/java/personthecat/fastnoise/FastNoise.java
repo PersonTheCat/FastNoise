@@ -1,9 +1,10 @@
-package personthecat.fastnoise.generator;
+package personthecat.fastnoise;
 
 import personthecat.fastnoise.data.Float2;
 import personthecat.fastnoise.data.Float3;
 import personthecat.fastnoise.data.InterpolationType;
 import personthecat.fastnoise.data.NoiseDescriptor;
+import personthecat.fastnoise.generator.DummyNoiseWrapper;
 
 import static personthecat.fastnoise.util.NoiseTables.CELL_2D;
 import static personthecat.fastnoise.util.NoiseTables.CELL_3D;

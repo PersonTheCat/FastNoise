@@ -8,7 +8,7 @@ import personthecat.fastnoise.generator.Cellular2EdgeNoise;
 import personthecat.fastnoise.generator.Cellular3EdgeNoise;
 import personthecat.fastnoise.generator.CubicNoise;
 import personthecat.fastnoise.generator.CubicFractalNoise;
-import personthecat.fastnoise.generator.FastNoise;
+import personthecat.fastnoise.FastNoise;
 import personthecat.fastnoise.generator.PerlinNoise;
 import personthecat.fastnoise.generator.PerlinFractalNoise;
 import personthecat.fastnoise.generator.SimplexNoise;

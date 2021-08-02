@@ -1,5 +1,6 @@
 package personthecat.fastnoise.generator;
 
+import personthecat.fastnoise.FastNoise;
 import personthecat.fastnoise.data.CellularDistanceType;
 import personthecat.fastnoise.data.Float2;
 import personthecat.fastnoise.data.Float3;

@@ -65,6 +65,12 @@ public class NoiseDescriptor {
         return this;
     }
 
+    // Backwards compatibility
+    public NoiseDescriptor stretch(final float stretch) {
+        this.frequencyY /= stretch;
+        return this;
+    }
+
     public NoiseDescriptor range(final float min, final float max) {
         this.scaleAmplitude = (max - min) / 2;
         this.scaleOffset = (min + max) / 2;

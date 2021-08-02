@@ -68,23 +68,27 @@ public abstract class FastNoise {
     }
 
     public float getNoise(float x, float y) {
-        x *= this.frequencyX;
-        y *= this.frequencyY;
-
         if (this.gradientPerturb) {
             return this.perturb(this.seed, x, y);
         }
+
+        x *= this.frequencyX;
+        y *= this.frequencyY;
+
         return this.getSingle(this.seed, x, y);
     }
 
     public float getNoise(float x, float y, float z) {
-        x *= this.frequencyX;
-        y = y * this.frequencyY + this.offset;
-        z *= this.frequencyZ;
+        y += this.offset;
 
         if (this.gradientPerturb) {
             return this.perturb(this.seed, x, y, z);
         }
+
+        x *= this.frequencyX;
+        y *= this.frequencyY;
+        z *= this.frequencyZ;
+
         return this.getSingle(this.seed, x, y, z);
     }
 
@@ -153,6 +157,9 @@ public abstract class FastNoise {
 
         x += lerp(lx0x, lx1x, ys) * this.gradientPerturbAmplitude;
         y += lerp(ly0x, ly1x, ys) * this.gradientPerturbAmplitude;
+
+        x *= this.frequencyX;
+        y *= this.frequencyY;
         return this.getSingle(seed, x, y);
     }
 
@@ -221,6 +228,10 @@ public abstract class FastNoise {
         x += lerp(lx0y, lerp(lx0x, lx1x, ys), zs) * this.gradientPerturbAmplitude;
         y += lerp(ly0y, lerp(ly0x, ly1x, ys), zs) * this.gradientPerturbAmplitude;
         z += lerp(lz0y, lerp(lz0x, lz1x, ys), zs) * this.gradientPerturbAmplitude;
+
+        x *= this.frequencyX;
+        y *= this.frequencyY;
+        z *= this.frequencyZ;
         return this.getSingle(seed, x, y, z);
     }
 }

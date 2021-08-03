@@ -23,7 +23,11 @@ public class DummyNoiseWrapper {
     }
 
     public FastNoise generatePassthrough() {
-        return new PassthroughGenerator(this, new NoiseDescriptor());
+        return this.generatePassthrough(1337);
+    }
+
+    public FastNoise generatePassthrough(final int seed) {
+        return new PassthroughGenerator(this, new NoiseDescriptor().seed(seed));
     }
 
     public static class WrappedGenerator extends FastNoise {

@@ -6,26 +6,9 @@ import personthecat.fastnoise.util.EnumNamingService;
 import java.util.regex.Pattern;
 
 public enum FractalType {
-    FBM {
-        @Override
-        public float apply(final float f) {
-            return f;
-        }
-    },
-    BILLOW {
-        @Override
-        public float apply(final float f) {
-            return Math.abs(f) * 2 - 1;
-        }
-    },
-    RIGID_MULTI {
-        @Override
-        public float apply(final float f) {
-            return 1 - Math.abs(f);
-        }
-    };
-
-    public abstract float apply(float f);
+    FBM,
+    BILLOW,
+    RIGID_MULTI;
 
     final Pattern pattern = EnumNamingService.createPattern(this);
     final String formatted = EnumNamingService.formatName(this);

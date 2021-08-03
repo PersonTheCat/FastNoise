@@ -1,7 +1,6 @@
 package personthecat.fastnoise;
 
 import personthecat.fastnoise.data.FractalType;
-import personthecat.fastnoise.data.InterpolationType;
 import personthecat.fastnoise.data.NoiseType;
 import personthecat.fastnoise.data.CellularDistanceType;
 import personthecat.fastnoise.data.CellularReturnType;
@@ -14,9 +13,9 @@ import java.util.Random;
 public class PerformanceTest {
     private static final int NUM_GENERATORS = 100;
     private static final int NUM_TESTS = 10000;
-    private static final int TEST_SIZE = 100; // 1000
-    private static final int MAX_OCTAVES = 10;
-    private static final int UPDATE_INTERVAL = 500;
+    private static final int TEST_SIZE = 200;
+    private static final int MAX_OCTAVES = 5;
+    private static final int UPDATE_INTERVAL = 10;
     private static final Random RAND = new Random();
 
     public static void main(final String[] args) {
@@ -66,7 +65,6 @@ public class PerformanceTest {
             return FastNoise.createDescriptor()
                 .noise(this.randomEnum(NoiseType.class))
                 .fractal(this.randomEnum(FractalType.class))
-                .interpolation(this.randomEnum(InterpolationType.class))
                 .distance(this.randomEnum(CellularDistanceType.class))
                 .cellularReturn(this.randomEnum(CellularReturnType.class))
                 .seed(RAND.nextInt())
@@ -89,7 +87,7 @@ public class PerformanceTest {
             return new OriginalFastNoise(RAND.nextInt())
                 .SetNoiseType(this.randomEnum(OriginalFastNoise.NoiseType.class))
                 .SetFractalType(this.randomEnum(OriginalFastNoise.FractalType.class))
-                .SetInterp(this.randomEnum(OriginalFastNoise.Interp.class))
+                .SetInterp(OriginalFastNoise.Interp.Quintic)
                 .SetCellularDistanceFunction(this.randomEnum(OriginalFastNoise.CellularDistanceFunction.class))
                 .SetCellularReturnType(this.randomEnum(OriginalFastNoise.CellularReturnType.class))
                 .SetCellularNoiseLookup(new OriginalFastNoise())

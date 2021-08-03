@@ -7,15 +7,12 @@ import personthecat.fastnoise.generator.Cellular1EdgeNoise;
 import personthecat.fastnoise.generator.Cellular2EdgeNoise;
 import personthecat.fastnoise.generator.Cellular3EdgeNoise;
 import personthecat.fastnoise.generator.CubicNoise;
-import personthecat.fastnoise.generator.CubicFractalNoise;
-import personthecat.fastnoise.FastNoise;
+import personthecat.fastnoise.generator.FractalNoise;
 import personthecat.fastnoise.generator.PerlinNoise;
-import personthecat.fastnoise.generator.PerlinFractalNoise;
 import personthecat.fastnoise.generator.SimplexNoise;
-import personthecat.fastnoise.generator.SimplexFractalNoise;
 import personthecat.fastnoise.generator.ValueNoise;
-import personthecat.fastnoise.generator.ValueFractalNoise;
 import personthecat.fastnoise.generator.WhiteNoise;
+import personthecat.fastnoise.FastNoise;
 
 @Data
 @Accessors(fluent = true)
@@ -24,7 +21,6 @@ public class NoiseDescriptor {
     private NoiseProvider provider = d -> this.selectGenerator();
     private NoiseType noise = NoiseType.SIMPLEX_FRACTAL;
     private FractalType fractal = FractalType.FBM;
-    private InterpolationType interpolation = InterpolationType.LINEAR;
     private CellularDistanceType distance = CellularDistanceType.EUCLIDEAN;
     private CellularReturnType cellularReturn = CellularReturnType.CELL_VALUE;
     private NoiseDescriptor noiseLookup = null;
@@ -93,15 +89,15 @@ public class NoiseDescriptor {
     private FastNoise selectGenerator() {
         switch (this.noise) {
             case VALUE: return new ValueNoise(this);
-            case VALUE_FRACTAL: return new ValueFractalNoise(this);
+            case VALUE_FRACTAL: return FractalNoise.create(this, ValueNoise::new);
             case PERLIN: return new PerlinNoise(this);
-            case PERLIN_FRACTAL: return new PerlinFractalNoise(this);
+            case PERLIN_FRACTAL: return FractalNoise.create(this, PerlinNoise::new);
             case SIMPLEX: return new SimplexNoise(this);
-            case SIMPLEX_FRACTAL: return new SimplexFractalNoise(this);
+            case SIMPLEX_FRACTAL: return FractalNoise.create(this, SimplexNoise::new);
             case CELLULAR: return this.getCellularGenerator();
             case WHITE_NOISE: return new WhiteNoise(this);
             case CUBIC: return new CubicNoise(this);
-            default: return new CubicFractalNoise(this);
+            default: return FractalNoise.create(this, CubicNoise::new);
         }
     }
 

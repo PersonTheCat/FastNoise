@@ -2,7 +2,6 @@ package personthecat.fastnoise;
 
 import personthecat.fastnoise.data.Float2;
 import personthecat.fastnoise.data.Float3;
-import personthecat.fastnoise.data.InterpolationType;
 import personthecat.fastnoise.data.NoiseDescriptor;
 import personthecat.fastnoise.generator.DummyNoiseWrapper;
 
@@ -11,14 +10,11 @@ import static personthecat.fastnoise.util.NoiseTables.CELL_3D;
 import static personthecat.fastnoise.util.NoiseUtils.fastFloor;
 import static personthecat.fastnoise.util.NoiseUtils.hash2;
 import static personthecat.fastnoise.util.NoiseUtils.hash3;
-import static personthecat.fastnoise.util.NoiseUtils.interpolateHermite;
-import static personthecat.fastnoise.util.NoiseUtils.interpolateQuintic;
 import static personthecat.fastnoise.util.NoiseUtils.lerp;
 
 public abstract class FastNoise {
 
     protected final int seed;
-    protected final InterpolationType interpolation;
     protected final float frequencyX;
     protected final float frequencyY;
     protected final float frequencyZ;
@@ -34,7 +30,6 @@ public abstract class FastNoise {
 
     public FastNoise(final NoiseDescriptor cfg) {
         this.seed = cfg.seed();
-        this.interpolation = cfg.interpolation();
         this.frequencyX = cfg.frequencyX();
         this.frequencyY = cfg.frequencyY();
         this.frequencyZ = cfg.frequencyZ();
@@ -128,20 +123,8 @@ public abstract class FastNoise {
         final int x1 = x0 + 1;
         final int y1 = y0 + 1;
 
-        final float xs, ys;
-        switch (this.interpolation) {
-            case LINEAR:
-                xs = xf - x0;
-                ys = yf - y0;
-                break;
-            case HERMITE:
-                xs = interpolateHermite(xf - x0);
-                ys = interpolateHermite(yf - y0);
-                break;
-            default:
-                xs = interpolateQuintic(xf - x0);
-                ys = interpolateQuintic(yf - y0);
-        }
+        final float xs = this.interpolate(x - x0);
+        final float ys = this.interpolate(y - y0);
 
         Float2 vec0 = CELL_2D[hash2(this.seed, x0, y0) & 255];
         Float2 vec1 = CELL_2D[hash2(this.seed, x1, y0) & 255];
@@ -175,23 +158,9 @@ public abstract class FastNoise {
         final int y1 = y0 + 1;
         final int z1 = z0 + 1;
 
-        final float xs, ys, zs;
-        switch (this.interpolation) {
-            case LINEAR:
-                xs = xf - x0;
-                ys = yf - y0;
-                zs = zf - z0;
-                break;
-            case HERMITE:
-                xs = interpolateHermite(xf - x0);
-                ys = interpolateHermite(yf - y0);
-                zs = interpolateHermite(zf - z0);
-                break;
-            default:
-                xs = interpolateQuintic(xf - x0);
-                ys = interpolateQuintic(yf - y0);
-                zs = interpolateQuintic(zf - z0);
-        }
+        final float xs = this.interpolate(xf - x0);
+        final float ys = this.interpolate(yf - y0);
+        final float zs = this.interpolate(zf - z0);
 
         Float3 vec0 = CELL_3D[hash3(this.seed, x0, y0, z0) & 255];
         Float3 vec1 = CELL_3D[hash3(this.seed, x1, y0, z0) & 255];
@@ -233,5 +202,9 @@ public abstract class FastNoise {
         y *= this.frequencyY;
         z *= this.frequencyZ;
         return this.getSingle(seed, x, y, z);
+    }
+
+    protected float interpolate(final float t) {
+        return t * t * t * (t * (t * 6 - 15) + 10);
     }
 }

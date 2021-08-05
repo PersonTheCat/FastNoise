@@ -7,9 +7,9 @@ import personthecat.fastnoise.data.Float3;
 @UtilityClass
 public class NoiseUtils {
 
-    private static final int X_PRIME = 1619;
-    private static final int Y_PRIME = 31337;
-    private static final int Z_PRIME = 6971;
+    public static final int X_PRIME = 501125321;
+    public static final int Y_PRIME = 1136930381;
+    public static final int Z_PRIME = 1720413743;
 
     public static int fastFloor(final float f) {
         return (f >= 0 ? (int) f : (int) f - 1);

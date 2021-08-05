@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+// Todo: now that settings are inconsistent, need to try and match them up.
+// Also should include fast noise lite as a reference.
 public class PerformanceTest {
     private static final int NUM_GENERATORS = 100;
     private static final int NUM_TESTS = 10000;

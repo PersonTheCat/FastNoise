@@ -7,15 +7,13 @@ import java.util.regex.Pattern;
 
 public enum NoiseType {
     VALUE,
-    VALUE_FRACTAL,
     PERLIN,
-    PERLIN_FRACTAL,
     SIMPLEX,
-    SIMPLEX_FRACTAL,
+    SIMPLEX2,
+    SIMPLEX2S,
     CELLULAR,
     WHITE_NOISE,
-    CUBIC,
-    CUBIC_FRACTAL;
+    CUBIC;
 
     final Pattern pattern = EnumNamingService.createPattern(this);
     final String formatted = EnumNamingService.formatName(this);

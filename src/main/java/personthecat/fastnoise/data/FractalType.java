@@ -8,7 +8,8 @@ import java.util.regex.Pattern;
 public enum FractalType {
     FBM,
     BILLOW,
-    RIGID_MULTI;
+    RIGID_MULTI,
+    NONE;
 
     final Pattern pattern = EnumNamingService.createPattern(this);
     final String formatted = EnumNamingService.formatName(this);

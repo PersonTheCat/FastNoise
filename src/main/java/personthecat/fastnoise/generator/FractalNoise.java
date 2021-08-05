@@ -35,7 +35,8 @@ public abstract class FractalNoise extends FastNoise {
         switch (cfg.fractal()) {
             case FBM: return new FbmFractalNoise(cfg, reference);
             case BILLOW: return new BillowFractalNoise(cfg, reference);
-            default: return new RigidFractalNoise(cfg, reference);
+            case RIGID_MULTI: return new RigidFractalNoise(cfg, reference);
+            default: return reference;
         }
     }
 

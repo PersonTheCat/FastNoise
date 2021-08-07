@@ -1,8 +1,8 @@
 # PersonTheCat/FastNoise
 
 A rewrite of the legacy [FastNoise_Java](https://github.com/Auburn/FastNoise_Java) project. Unlike the
-original, this library is highly extensible. It replaces most of the existing enum types with functional
-interfaces and provides concrete implementations for each of the original FastNoise generators. 
+original, this library is highly extensible. It provides concrete implementations for each of the original
+FastNoise generators and even includes a few of the newer features from FastNoiseLite.
 
 # Motivations and Goals
 
@@ -19,8 +19,8 @@ object.
 
 ```java
 final FastNoise generator = FastNoise.createDescriptor()
-  .noise(NoiseType.SIMPLEX_FRACTAL)
-  .interpolation(InterpolationType.FBM)
+  .noise(NoiseType.SIMPLEX)
+  .fractal(FractalType.FBM)
   .frequency(0.1F)
   .generate();
 ```
@@ -40,33 +40,44 @@ final FastNoise generator = FastNoise.createDescriptor()
 ## Wrapping Bare-bones Noise Functions
 
 Alternatively, FastNoise is capable of wrapping raw noise functions. A convenient way to use this feature
-is to construct a `DummyNoiseWrapper` and pass it directly into the FastNoise constructor.
+is to construct a `DummyNoiseWrapper`. The output of this wrapper can either be modified by a 
+`NoiseDescriptor` or used directly as a passthrough generator.
 
 ```java
-final NoiseWrapper wrapper = new DummyNoiseWrapper()
-  .wrapNoise2((x, y) -> 1);
+final FastNoise modified = new DummyNoiseWrapper()
+  .wrapNoise2((s, x, y) -> 1)
+  .createDescriptor()
+  .frequency(0.2F)
+  .generate();
 
-final FastNoise generator = new FastNoise(wrapper);
+final FastNoise passthrough = new DummyNoiseWrapper()
+  .wrapNoise3((s, x, y, z) -> 1)
+  .generatePassthrough();
 ```
 
 ## Using Noise Modifiers
 
-`NoiseModifier` is a data transfer object which contains a few settings related to the amplitude of the
-generator output and thresholds used for creating booleans from the output. It can be constructed with a
-similar API.
+`NoiseDescriptor` also contains a few settings related to the amplitude of the generator output and
+thresholds used for creating booleans from the output. The options can be used as follows:
 
 ```java
-final NoiseWrapper wrapper = new DummyNoiseWrapper()
-  .wrapNoise2((x, y) -> 0.5)
-  .wrapNoise3((x, y, z) -> 0.2);
 
-final NoiseModifier modifier = new NoiseModifier()
-  .minThreshold(0.2)
-  .maxThreshold(0.5);
+final FastNoise generator = FastNoise.createDescriptor()
+  .threshold(0.2F, 0.5F)
+  .range(-25.0F, 50.0F)
+  .generate();
 
-final FastNoise generator = new FastNoise(wrapper, modifier);
+// True if original value is in 0.2 ~ 0.5
+final boolean demo1 = generator.getBoolean(1, 2);
 
-final boolean demo = generator.getBoolean(1, 2);
+// Instead of -1 to 1, is in -25 to 50
+final float demo2 = generator.getNoiseScaled(3, 4);
 ```
 
+## Testing Noise Output
+
+Currently, this library is still very experimental. If you would like to tinker with a few of the new
+and modified settings, you can boot up NoiseViewer from the test source set. It contains a very simple
+command line interface and will render a noise image to the screen as you update the underlying noise
+descriptor.
 

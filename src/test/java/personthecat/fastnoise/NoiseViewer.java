@@ -300,8 +300,8 @@ public class NoiseViewer {
                     if (length == 1) {
                         final float amp = this.descriptor.scaleAmplitude();
                         final float ost = this.descriptor.scaleOffset();
-                        final float min = -1.0F * amp + ost;
-                        final float max = 1.0F * amp + ost;
+                        final float min = -amp + ost;
+                        final float max = amp + ost;
                         System.out.println(min + " ~ " + max);
                         return;
                     }

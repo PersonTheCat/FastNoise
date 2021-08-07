@@ -12,7 +12,7 @@ public class NoiseViewer {
 
     private static final int IMAGE_SIZE = 500;
     private static final int PAGE_SIZE = 5;
-    private static final int COORDINATE_RANGE = (int) Math.pow(2, 16);
+    private static final int COORDINATE_RANGE = 1 << 16;
 
     public static void main(final String[] args) {
         new Context(new Scanner(System.in)).run();

@@ -70,7 +70,7 @@ public class NoiseViewer {
                 case "i": this.up(); break;
                 case "k": this.down(); break;
                 case "t": this.toggle(); break;
-                case "p": System.out.println(this.descriptor); break;
+                case "p": System.out.println(this.descriptor + "\n" + this.generator); break;
                 case "q": System.exit(0);
                 default: this.set(command);
             }

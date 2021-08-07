@@ -13,7 +13,7 @@ public class NoiseDescriptor {
 
     private NoiseProvider provider = d -> this.createGenerator();
     private NoiseType noise = NoiseType.SIMPLEX;
-    private FractalType fractal = FractalType.FBM;
+    private FractalType fractal = FractalType.NONE;
     private DomainWarpType warp = DomainWarpType.NONE;
     private CellularDistanceType distance = CellularDistanceType.EUCLIDEAN;
     private CellularReturnType cellularReturn = CellularReturnType.CELL_VALUE;
@@ -28,15 +28,15 @@ public class NoiseDescriptor {
     private float lacunarityZ = 2.0F;
     private float gain = 0.5F;
     private float pingPongStrength = 2.0F;
-    private float jitterX = 0.45F;
-    private float jitterY = 0.45F;
-    private float jitterZ = 0.45F;
+    private float jitterX = 1.0F;
+    private float jitterY = 1.0F;
+    private float jitterZ = 1.0F;
     private float warpAmplitudeX = 1.0F;
     private float warpAmplitudeY = 1.0F;
     private float warpAmplitudeZ = 1.0F;
-    private float warpFrequencyX = 0.1F;
-    private float warpFrequencyY = 0.1F;
-    private float warpFrequencyZ = 0.1F;
+    private float warpFrequencyX = 0.01F;
+    private float warpFrequencyY = 0.01F;
+    private float warpFrequencyZ = 0.01F;
     private float offsetX = 0;
     private float offsetY = 0;
     private float offsetZ = 0;

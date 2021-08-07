@@ -4,12 +4,12 @@ import lombok.experimental.UtilityClass;
 import personthecat.fastnoise.data.Float2;
 import personthecat.fastnoise.data.Float3;
 
+import static personthecat.fastnoise.util.NoiseValues.X_PRIME;
+import static personthecat.fastnoise.util.NoiseValues.Y_PRIME;
+import static personthecat.fastnoise.util.NoiseValues.Z_PRIME;
+
 @UtilityClass
 public class NoiseUtils {
-
-    public static final int X_PRIME = 501125321;
-    public static final int Y_PRIME = 1136930381;
-    public static final int Z_PRIME = 1720413743;
 
     public static int fastFloor(final float f) {
         return (f >= 0 ? (int) f : (int) f - 1);

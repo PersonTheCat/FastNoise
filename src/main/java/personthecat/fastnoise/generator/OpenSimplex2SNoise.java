@@ -7,16 +7,16 @@ import static personthecat.fastnoise.util.NoiseUtils.fastFloor;
 import static personthecat.fastnoise.util.NoiseUtils.gradient2;
 import static personthecat.fastnoise.util.NoiseUtils.gradient3;
 
-import static personthecat.fastnoise.util.NoiseUtils.X_PRIME;
-import static personthecat.fastnoise.util.NoiseUtils.Y_PRIME;
-import static personthecat.fastnoise.util.NoiseUtils.Z_PRIME;
+import static personthecat.fastnoise.util.NoiseValues.X_PRIME;
+import static personthecat.fastnoise.util.NoiseValues.Y_PRIME;
+import static personthecat.fastnoise.util.NoiseValues.Z_PRIME;
+import static personthecat.fastnoise.util.NoiseValues.F2;
+import static personthecat.fastnoise.util.NoiseValues.G2;
+import static personthecat.fastnoise.util.NoiseValues.R3;
 
 public class OpenSimplex2SNoise extends FastNoise {
 
-    private static final float SQRT3 = 1.7320508075688772935274463415059f;
-    private static final float F2 = 0.5f * (SQRT3 - 1);
-    private static final float G2 = (3 - SQRT3) / 6;
-    private static final float R3 = 2.0f / 3.0f;
+    private static final int X_PRIME_2 = X_PRIME << 1;
     private static final int Y_PRIME_2 = Y_PRIME << 1;
     private static final int Z_PRIME_2 = Z_PRIME << 1;
 
@@ -75,7 +75,7 @@ public class OpenSimplex2SNoise extends FastNoise {
                 float y2 = y0 + 3 * G2 - 1;
                 float a2 = (2.0f / 3.0f) - x2 * x2 - y2 * y2;
                 if (a2 > 0) {
-                    value += (a2 * a2) * (a2 * a2) * gradient2(seed, i + (X_PRIME << 1), j + Y_PRIME, x2, y2);
+                    value += (a2 * a2) * (a2 * a2) * gradient2(seed, i + X_PRIME_2, j + Y_PRIME, x2, y2);
                 }
             } else {
                 float x2 = x0 + G2;

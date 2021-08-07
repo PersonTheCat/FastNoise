@@ -33,9 +33,10 @@ public abstract class FractalNoise extends FastNoise {
 
     public static FastNoise create(final NoiseDescriptor cfg, final FastNoise reference) {
         switch (cfg.fractal()) {
-            case FBM: return new FbmFractalNoise(cfg, reference);
-            case BILLOW: return new BillowFractalNoise(cfg, reference);
-            case RIGID_MULTI: return new RigidFractalNoise(cfg, reference);
+            case FBM: return new Fbm(cfg, reference);
+            case BILLOW: return new Billow(cfg, reference);
+            case RIGID_MULTI: return new Rigid(cfg, reference);
+            case PING_PONG: return new PingPong(cfg, reference);
             default: return reference;
         }
     }
@@ -87,4 +88,76 @@ public abstract class FractalNoise extends FastNoise {
         return sum * this.fractalBounding;
     }
 
+    public static class Fbm extends FractalNoise {
+
+        public Fbm(final NoiseDescriptor cfg, final FastNoise reference) {
+            super(cfg, reference);
+        }
+
+        public Fbm(final NoiseDescriptor cfg, final NoiseProvider provider) {
+            this(cfg, provider.apply(cfg));
+        }
+
+        @Override
+        protected float fractal(float f) {
+            return f;
+        }
+    }
+
+    public static class Billow extends FractalNoise {
+
+        public Billow(final NoiseDescriptor cfg, final FastNoise reference) {
+            super(cfg, reference);
+        }
+
+        public Billow(final NoiseDescriptor cfg, final NoiseProvider provider) {
+            this(cfg, provider.apply(cfg));
+        }
+
+        @Override
+        protected float fractal(float f) {
+            return Math.abs(f) * 2 - 1;
+        }
+    }
+
+    public static class Rigid extends FractalNoise {
+
+        public Rigid(final NoiseDescriptor cfg, final FastNoise reference) {
+            super(cfg, reference);
+        }
+
+        public Rigid(final NoiseDescriptor cfg, final NoiseProvider provider) {
+            this(cfg, provider.apply(cfg));
+        }
+
+        @Override
+        protected float fractal(float f) {
+            return 1 - Math.abs(f);
+        }
+    }
+
+    public static class PingPong extends FractalNoise {
+
+        private final float strength;
+
+        public PingPong(final NoiseDescriptor cfg, final FastNoise reference) {
+            super(cfg, reference);
+            this.strength = cfg.pingPongStrength();
+        }
+
+        public PingPong(final NoiseDescriptor cfg, final NoiseProvider provider) {
+            this(cfg, provider.apply(cfg));
+        }
+
+        @Override
+        protected float fractal(float f) {
+            f = (f + 1) * this.strength;
+            return (pingPong(f) - 0.5F) * 2.0F;
+        }
+
+        private static float pingPong(float t) {
+            t -= (int) (t * 0.5f) * 2;
+            return t < 1 ? t : 2 - t;
+        }
+    }
 }

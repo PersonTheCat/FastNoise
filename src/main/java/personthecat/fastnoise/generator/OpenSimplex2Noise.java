@@ -8,18 +8,16 @@ import static personthecat.fastnoise.util.NoiseUtils.fastRound;
 import static personthecat.fastnoise.util.NoiseUtils.gradient2;
 import static personthecat.fastnoise.util.NoiseUtils.gradient3;
 
-import static personthecat.fastnoise.util.NoiseUtils.X_PRIME;
-import static personthecat.fastnoise.util.NoiseUtils.Y_PRIME;
-import static personthecat.fastnoise.util.NoiseUtils.Z_PRIME;
+import static personthecat.fastnoise.util.NoiseValues.X_PRIME;
+import static personthecat.fastnoise.util.NoiseValues.Y_PRIME;
+import static personthecat.fastnoise.util.NoiseValues.Z_PRIME;
+import static personthecat.fastnoise.util.NoiseValues.F2;
+import static personthecat.fastnoise.util.NoiseValues.G2;
+import static personthecat.fastnoise.util.NoiseValues.R3;
 
 // We may or may not remove one of these classes.
 // Still testing performance.
 public class OpenSimplex2Noise extends FastNoise {
-
-    private static final float SQRT3 = 1.7320508075688772935274463415059f;
-    private static final float F2 = 0.5f * (SQRT3 - 1);
-    private static final float G2 = (3 - SQRT3) / 6;
-    private static final float R3 = 2.0f / 3.0f;
 
     public OpenSimplex2Noise(final NoiseDescriptor cfg) {
         super(cfg);

@@ -3,26 +3,18 @@ package personthecat.fastnoise.data;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import personthecat.fastnoise.function.NoiseProvider;
-import personthecat.fastnoise.generator.Cellular1EdgeNoise;
-import personthecat.fastnoise.generator.Cellular2EdgeNoise;
-import personthecat.fastnoise.generator.Cellular3EdgeNoise;
-import personthecat.fastnoise.generator.CubicNoise;
-import personthecat.fastnoise.generator.FractalNoise;
-import personthecat.fastnoise.generator.OpenSimplex2Noise;
-import personthecat.fastnoise.generator.OpenSimplex2SNoise;
-import personthecat.fastnoise.generator.PerlinNoise;
-import personthecat.fastnoise.generator.SimplexNoise;
-import personthecat.fastnoise.generator.ValueNoise;
-import personthecat.fastnoise.generator.WhiteNoise;
+import personthecat.fastnoise.generator.*;
 import personthecat.fastnoise.FastNoise;
 
 @Data
 @Accessors(fluent = true)
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public class NoiseDescriptor {
 
     private NoiseProvider provider = d -> this.createGenerator();
     private NoiseType noise = NoiseType.SIMPLEX;
     private FractalType fractal = FractalType.FBM;
+    private DomainWarpType warp = DomainWarpType.NONE;
     private CellularDistanceType distance = CellularDistanceType.EUCLIDEAN;
     private CellularReturnType cellularReturn = CellularReturnType.CELL_VALUE;
     private NoiseDescriptor noiseLookup = null;
@@ -35,13 +27,19 @@ public class NoiseDescriptor {
     private float lacunarityY = 2.0F;
     private float lacunarityZ = 2.0F;
     private float gain = 0.5F;
+    private float pingPongStrength = 2.0F;
     private float jitterX = 0.45F;
     private float jitterY = 0.45F;
     private float jitterZ = 0.45F;
-    private boolean gradientPerturb = false;
-    private float gradientPerturbAmplitude = 1.0F / 0.45F;
-    private float gradientPerturbFrequency = 0.1F;
-    private int offset = 0;
+    private float warpAmplitudeX = 1.0F;
+    private float warpAmplitudeY = 1.0F;
+    private float warpAmplitudeZ = 1.0F;
+    private float warpFrequencyX = 0.1F;
+    private float warpFrequencyY = 0.1F;
+    private float warpFrequencyZ = 0.1F;
+    private float offsetX = 0;
+    private float offsetY = 0;
+    private float offsetZ = 0;
     private boolean invert = false;
     private float scaleAmplitude = 1.0F;
     private float scaleOffset = 0.0F;
@@ -60,6 +58,21 @@ public class NoiseDescriptor {
 
     public NoiseDescriptor jitter(final float jitter) {
         this.jitterX = this.jitterY = this.jitterZ = jitter;
+        return this;
+    }
+
+    public NoiseDescriptor warpAmplitude(final float amplitude) {
+        this.warpAmplitudeX = this.warpAmplitudeY = this.warpAmplitudeZ = amplitude;
+        return this;
+    }
+
+    public NoiseDescriptor warpFrequency(final float frequency) {
+        this.warpFrequencyX = this.warpFrequencyY = this.warpFrequencyZ = frequency;
+        return this;
+    }
+
+    public NoiseDescriptor offset(final float offset) {
+        this.offsetY = offset;
         return this;
     }
 
@@ -82,14 +95,10 @@ public class NoiseDescriptor {
         return this;
     }
 
-    public NoiseDescriptor gradientPerturbAmplitude(final float amplitude) {
-        // In the original library, this value was always reduced.
-        this.gradientPerturbAmplitude = amplitude / 0.45F;
-        return this;
-    }
-
     private FastNoise createGenerator() {
-        return FractalNoise.create(this, this.getBasicGenerator());
+        FastNoise generator = this.getBasicGenerator();
+        generator = FractalNoise.create(this, generator);
+        return DomainWarpedNoise.create(this, generator);
     }
 
     private FastNoise getBasicGenerator() {

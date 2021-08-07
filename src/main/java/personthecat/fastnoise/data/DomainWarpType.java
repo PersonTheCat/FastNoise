@@ -5,19 +5,18 @@ import personthecat.fastnoise.util.EnumNamingService;
 
 import java.util.regex.Pattern;
 
-public enum FractalType {
-    FBM,
-    BILLOW,
-    RIGID_MULTI,
-    PING_PONG,
+public enum DomainWarpType {
+    SIMPLEX2,
+    SIMPLEX2_REDUCED,
+    BASIC_GRID,
     NONE;
 
     final Pattern pattern = EnumNamingService.createPattern(this);
     final String formatted = EnumNamingService.formatName(this);
 
     @Nullable
-    public static FractalType from(final String s) {
-        for (final FractalType t : values()) {
+    public static DomainWarpType from(final String s) {
+        for (final DomainWarpType t : values()) {
             if (t.pattern.matcher(s).matches()) {
                 return t;
             }

@@ -29,6 +29,14 @@ public abstract class Cellular1EdgeNoise extends FastNoise {
         this.jitterZ = cfg.jitterZ();
     }
 
+    public Cellular1EdgeNoise(final int seed) {
+        super(seed);
+        this.distance = CellularDistanceType.EUCLIDEAN;
+        this.jitterX = 1.0F;
+        this.jitterY = 1.0F;
+        this.jitterZ = 1.0F;
+    }
+
     public static Cellular1EdgeNoise create(final NoiseDescriptor cfg) {
         switch (cfg.cellularReturn()) {
             case DISTANCE: return new Distance(cfg);
@@ -195,6 +203,10 @@ public abstract class Cellular1EdgeNoise extends FastNoise {
             super(cfg);
         }
 
+        public CellValue(final int seed) {
+            super(seed);
+        }
+
         @Override
         protected float getReturn(final int x, final int y, final float distance) {
             return value2(0, x, y);
@@ -217,6 +229,11 @@ public abstract class Cellular1EdgeNoise extends FastNoise {
                 : new NoiseDescriptor().generate();
         }
 
+        public NoiseLookup(final int seed) {
+            super(seed);
+            this.lookup = new SimplexNoise(seed);
+        }
+
         @Override
         protected float getReturn(final int x, final int y, final float distance) {
             final Float2 vec = CELL_2D[hash2(this.seed, x, y) & 255];
@@ -234,6 +251,10 @@ public abstract class Cellular1EdgeNoise extends FastNoise {
 
         public Distance(final NoiseDescriptor cfg) {
             super(cfg);
+        }
+
+        public Distance(final int seed) {
+            super(seed);
         }
 
         @Override

@@ -19,6 +19,10 @@ public class SimplexNoise extends FastNoise {
         super(cfg);
     }
 
+    public SimplexNoise(final int seed) {
+        super(seed);
+    }
+
     @Override
     public float getSingle(int seed, float x) {
         return 0;

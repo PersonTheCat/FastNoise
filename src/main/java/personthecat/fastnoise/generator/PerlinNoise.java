@@ -15,6 +15,10 @@ public class PerlinNoise extends FastNoise {
         super(cfg);
     }
 
+    public PerlinNoise(final int seed) {
+        super(seed);
+    }
+
     @Override
     public final float getSingle(final int seed, float x) {
         x -= fastFloor(x);

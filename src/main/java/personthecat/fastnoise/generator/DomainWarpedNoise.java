@@ -28,22 +28,33 @@ import static personthecat.fastnoise.util.NoiseValues.R3;
 public abstract class DomainWarpedNoise extends FastNoise {
 
     protected final FastNoise reference;
-    protected final float domainWarpAmplitudeX;
-    protected final float domainWarpAmplitudeY;
-    protected final float domainWarpAmplitudeZ;
-    protected final float domainWarpFrequencyX;
-    protected final float domainWarpFrequencyY;
-    protected final float domainWarpFrequencyZ;
+    protected final float warpAmplitudeX;
+    protected final float warpAmplitudeY;
+    protected final float warpAmplitudeZ;
+    protected final float warpFrequencyX;
+    protected final float warpFrequencyY;
+    protected final float warpFrequencyZ;
 
     public DomainWarpedNoise(final NoiseDescriptor cfg, final FastNoise reference) {
         super(cfg);
         this.reference = reference;
-        this.domainWarpAmplitudeX = cfg.warpAmplitudeX();
-        this.domainWarpAmplitudeY = cfg.warpAmplitudeY();
-        this.domainWarpAmplitudeZ = cfg.warpAmplitudeZ();
-        this.domainWarpFrequencyX = cfg.warpFrequencyX();
-        this.domainWarpFrequencyY = cfg.warpFrequencyY();
-        this.domainWarpFrequencyZ = cfg.warpFrequencyZ();
+        this.warpAmplitudeX = cfg.warpAmplitudeX();
+        this.warpAmplitudeY = cfg.warpAmplitudeY();
+        this.warpAmplitudeZ = cfg.warpAmplitudeZ();
+        this.warpFrequencyX = cfg.warpFrequencyX();
+        this.warpFrequencyY = cfg.warpFrequencyY();
+        this.warpFrequencyZ = cfg.warpFrequencyZ();
+    }
+
+    public DomainWarpedNoise(final int seed, final FastNoise reference) {
+        super(seed);
+        this.reference = reference;
+        this.warpAmplitudeX = 1.0F;
+        this.warpAmplitudeY = 1.0F;
+        this.warpAmplitudeZ = 1.0F;
+        this.warpFrequencyX = 0.1F;
+        this.warpFrequencyY = 0.1F;
+        this.warpFrequencyZ = 0.1F;
     }
 
     public static FastNoise create(final NoiseDescriptor cfg, final NoiseProvider provider) {
@@ -88,8 +99,8 @@ public abstract class DomainWarpedNoise extends FastNoise {
 
         @Override
         public float getNoise(float x, float y) {
-            final float xf = x * this.domainWarpFrequencyX;
-            final float yf = y * this.domainWarpFrequencyY;
+            final float xf = x * this.warpFrequencyX;
+            final float yf = y * this.warpFrequencyY;
 
             final int x0 = fastFloor(xf);
             final int y0 = fastFloor(yf);
@@ -111,8 +122,8 @@ public abstract class DomainWarpedNoise extends FastNoise {
             final float lx1x = lerp(vec0.x, vec1.x, xs);
             final float ly1x = lerp(vec0.y, vec1.y, xs);
 
-            x += lerp(lx0x, lx1x, ys) * this.domainWarpAmplitudeX;
-            y += lerp(ly0x, ly1x, ys) * this.domainWarpAmplitudeY;
+            x += lerp(lx0x, lx1x, ys) * this.warpAmplitudeX;
+            y += lerp(ly0x, ly1x, ys) * this.warpAmplitudeY;
 
             x *= this.frequencyX;
             y *= this.frequencyY;
@@ -121,9 +132,9 @@ public abstract class DomainWarpedNoise extends FastNoise {
 
         @Override
         public float getNoise(float x, float y, float z) {
-            final float xf = x * this.domainWarpFrequencyX;
-            final float yf = y * this.domainWarpFrequencyY;
-            final float zf = z * this.domainWarpFrequencyZ;
+            final float xf = x * this.warpFrequencyX;
+            final float yf = y * this.warpFrequencyY;
+            final float zf = z * this.warpFrequencyZ;
 
             final int x0 = fastFloor(xf);
             final int y0 = fastFloor(yf);
@@ -168,9 +179,9 @@ public abstract class DomainWarpedNoise extends FastNoise {
             ly1x = lerp(vec0.y, vec1.y, xs);
             lz1x = lerp(vec0.z, vec1.z, xs);
 
-            x += lerp(lx0y, lerp(lx0x, lx1x, ys), zs) * this.domainWarpAmplitudeX;
-            y += lerp(ly0y, lerp(ly0x, ly1x, ys), zs) * this.domainWarpAmplitudeY;
-            z += lerp(lz0y, lerp(lz0x, lz1x, ys), zs) * this.domainWarpAmplitudeZ;
+            x += lerp(lx0y, lerp(lx0x, lx1x, ys), zs) * this.warpAmplitudeX;
+            y += lerp(ly0y, lerp(ly0x, ly1x, ys), zs) * this.warpAmplitudeY;
+            z += lerp(lz0y, lerp(lz0x, lz1x, ys), zs) * this.warpAmplitudeZ;
 
             x += this.offsetX;
             y += this.offsetY;
@@ -191,8 +202,8 @@ public abstract class DomainWarpedNoise extends FastNoise {
 
         @Override
         public float getNoise(float x, float y) {
-            float xs = x * this.domainWarpFrequencyX;
-            float ys = y * this.domainWarpFrequencyY;
+            float xs = x * this.warpFrequencyX;
+            float ys = y * this.warpFrequencyY;
 
             final float s = (xs + ys) * F2;
             xs += s;
@@ -288,8 +299,8 @@ public abstract class DomainWarpedNoise extends FastNoise {
                 }
             }
 
-            x += vx * this.domainWarpAmplitudeX * 38.283687591552734375f;
-            y += vy * this.domainWarpAmplitudeY * 38.283687591552734375f;
+            x += vx * this.warpAmplitudeX * 38.283687591552734375f;
+            y += vy * this.warpAmplitudeY * 38.283687591552734375f;
 
             x *= this.frequencyX;
             y *= this.frequencyY;
@@ -298,9 +309,9 @@ public abstract class DomainWarpedNoise extends FastNoise {
 
         @Override
         public float getNoise(float x, float y, float z) {
-            float xr = x * this.domainWarpFrequencyX;
-            float yr = y * this.domainWarpFrequencyY;
-            float zr = y * this.domainWarpFrequencyZ;
+            float xr = x * this.warpFrequencyX;
+            float yr = y * this.warpFrequencyY;
+            float zr = y * this.warpFrequencyZ;
 
             final float r = (xr + yr + zr) * R3; // Rotation, not skew
             xr = r - xr;
@@ -422,9 +433,9 @@ public abstract class DomainWarpedNoise extends FastNoise {
             y += this.offsetY;
             z += this.offsetZ;
 
-            x += vx * this.domainWarpAmplitudeX * 32.69428253173828125f;
-            y += vy * this.domainWarpAmplitudeY * 32.69428253173828125f;
-            z += vz * this.domainWarpAmplitudeZ * 32.69428253173828125f;
+            x += vx * this.warpAmplitudeX * 32.69428253173828125f;
+            y += vy * this.warpAmplitudeY * 32.69428253173828125f;
+            z += vz * this.warpAmplitudeZ * 32.69428253173828125f;
 
             x *= this.frequencyX;
             y *= this.frequencyY;
@@ -441,8 +452,8 @@ public abstract class DomainWarpedNoise extends FastNoise {
 
         @Override
         public float getNoise(float x, float y) {
-            float xs = x * this.domainWarpFrequencyX;
-            float ys = y * this.domainWarpFrequencyY;
+            float xs = x * this.warpFrequencyX;
+            float ys = y * this.warpFrequencyY;
 
             final float s = (xs + ys) * F2;
             xs += s;
@@ -508,8 +519,8 @@ public abstract class DomainWarpedNoise extends FastNoise {
                 }
             }
 
-            x += vx * this.domainWarpAmplitudeX * 16.0f;
-            y += vy * this.domainWarpAmplitudeY * 16.0f;
+            x += vx * this.warpAmplitudeX * 16.0f;
+            y += vy * this.warpAmplitudeY * 16.0f;
 
             x *= this.frequencyX;
             y *= this.frequencyY;
@@ -518,9 +529,9 @@ public abstract class DomainWarpedNoise extends FastNoise {
 
         @Override
         public float getNoise(float x, float y, float z) {
-            float xr = x * this.domainWarpFrequencyX;
-            float yr = y * this.domainWarpFrequencyY;
-            float zr = y * this.domainWarpFrequencyZ;
+            float xr = x * this.warpFrequencyX;
+            float yr = y * this.warpFrequencyY;
+            float zr = y * this.warpFrequencyZ;
 
             final float r = (xr + yr + zr) * R3; // Rotation, not skew
             xr = r - xr;
@@ -614,9 +625,9 @@ public abstract class DomainWarpedNoise extends FastNoise {
             y += this.offsetY;
             z += this.offsetZ;
 
-            x += vx * this.domainWarpAmplitudeX * 7.71604938271605f;
-            y += vy * this.domainWarpAmplitudeY * 7.71604938271605f;
-            z += vz * this.domainWarpAmplitudeZ * 7.71604938271605f;
+            x += vx * this.warpAmplitudeX * 7.71604938271605f;
+            y += vy * this.warpAmplitudeY * 7.71604938271605f;
+            z += vz * this.warpAmplitudeZ * 7.71604938271605f;
 
             x *= this.frequencyX;
             y *= this.frequencyY;

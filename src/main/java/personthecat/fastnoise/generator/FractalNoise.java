@@ -27,6 +27,17 @@ public abstract class FractalNoise extends FastNoise {
         this.reference = reference;
     }
 
+    public FractalNoise(final int seed, final FastNoise reference) {
+        super(seed);
+        this.lacunarityX = 2.0F;
+        this.lacunarityY = 2.0F;
+        this.lacunarityZ = 2.0F;
+        this.gain = 0.5F;
+        this.octaves = 3;
+        this.fractalBounding = getFractalBounding(this.gain, this.octaves);
+        this.reference = reference;
+    }
+
     public static FastNoise create(final NoiseDescriptor cfg, final NoiseProvider provider) {
         return create(cfg, provider.apply(cfg));
     }
@@ -98,6 +109,10 @@ public abstract class FractalNoise extends FastNoise {
             this(cfg, provider.apply(cfg));
         }
 
+        public Fbm(final int seed, final FastNoise reference) {
+            super(seed, reference);
+        }
+
         @Override
         protected float fractal(float f) {
             return f;
@@ -114,6 +129,10 @@ public abstract class FractalNoise extends FastNoise {
             this(cfg, provider.apply(cfg));
         }
 
+        public Billow(final int seed, final FastNoise reference) {
+            super(seed, reference);
+        }
+
         @Override
         protected float fractal(float f) {
             return Math.abs(f) * 2 - 1;
@@ -128,6 +147,10 @@ public abstract class FractalNoise extends FastNoise {
 
         public Rigid(final NoiseDescriptor cfg, final NoiseProvider provider) {
             this(cfg, provider.apply(cfg));
+        }
+
+        public Rigid(final int seed, final FastNoise reference) {
+            super(seed, reference);
         }
 
         @Override
@@ -147,6 +170,11 @@ public abstract class FractalNoise extends FastNoise {
 
         public PingPong(final NoiseDescriptor cfg, final NoiseProvider provider) {
             this(cfg, provider.apply(cfg));
+        }
+
+        public PingPong(final int seed, final FastNoise reference) {
+            super(seed, reference);
+            this.strength = 2.0F;
         }
 
         @Override

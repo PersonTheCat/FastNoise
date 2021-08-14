@@ -27,7 +27,7 @@ public class DummyNoiseWrapper {
     }
 
     public FastNoise generatePassthrough(final int seed) {
-        return new PassthroughGenerator(this, new NoiseDescriptor().seed(seed));
+        return new PassthroughGenerator(this, seed);
     }
 
     public static class WrappedGenerator extends FastNoise {
@@ -38,6 +38,13 @@ public class DummyNoiseWrapper {
 
         private WrappedGenerator(final DummyNoiseWrapper wrapper, final NoiseDescriptor cfg) {
             super(cfg);
+            this.wrapNoise1 = wrapper.wrapNoise1;
+            this.wrapNoise2 = wrapper.wrapNoise2;
+            this.wrapNoise3 = wrapper.wrapNoise3;
+        }
+
+        private WrappedGenerator(final DummyNoiseWrapper wrapper, final int seed) {
+            super(seed);
             this.wrapNoise1 = wrapper.wrapNoise1;
             this.wrapNoise2 = wrapper.wrapNoise2;
             this.wrapNoise3 = wrapper.wrapNoise3;
@@ -61,8 +68,8 @@ public class DummyNoiseWrapper {
 
     public static class PassthroughGenerator extends WrappedGenerator {
 
-        private PassthroughGenerator(final DummyNoiseWrapper wrapper, final NoiseDescriptor cfg) {
-            super(wrapper, cfg);
+        private PassthroughGenerator(final DummyNoiseWrapper wrapper, final int seed) {
+            super(wrapper, seed);
         }
 
         @Override

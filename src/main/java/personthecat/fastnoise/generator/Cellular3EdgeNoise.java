@@ -27,6 +27,14 @@ public abstract class Cellular3EdgeNoise extends FastNoise {
         this.jitterZ = cfg.jitterZ();
     }
 
+    public Cellular3EdgeNoise(final int seed) {
+        super(seed);
+        this.distance = CellularDistanceType.EUCLIDEAN;
+        this.jitterX = 1.0F;
+        this.jitterY = 1.0F;
+        this.jitterZ = 1.0F;
+    }
+
     public static Cellular3EdgeNoise create(final NoiseDescriptor cfg) {
         switch (cfg.cellularReturn()) {
             case DISTANCE3_ADD: return new Add(cfg);
@@ -180,6 +188,10 @@ public abstract class Cellular3EdgeNoise extends FastNoise {
             super(cfg);
         }
 
+        public Distance(final int seed) {
+            super(seed);
+        }
+
         @Override
         public float getReturn(final float distance, final float distance2, final float distance3) {
             return distance3 - 1;
@@ -190,6 +202,10 @@ public abstract class Cellular3EdgeNoise extends FastNoise {
 
         public Add(final NoiseDescriptor cfg) {
             super(cfg);
+        }
+
+        public Add(final int seed) {
+            super(seed);
         }
 
         @Override
@@ -204,6 +220,10 @@ public abstract class Cellular3EdgeNoise extends FastNoise {
             super(cfg);
         }
 
+        public Sub(final int seed) {
+            super(seed);
+        }
+
         @Override
         public float getReturn(final float distance, final float distance2, final float distance3) {
             return distance3 - distance - 1;
@@ -216,6 +236,10 @@ public abstract class Cellular3EdgeNoise extends FastNoise {
             super(cfg);
         }
 
+        public Mul(final int seed) {
+            super(seed);
+        }
+
         @Override
         public float getReturn(final float distance, final float distance2, final float distance3) {
             return distance3 * distance - 1;
@@ -226,6 +250,10 @@ public abstract class Cellular3EdgeNoise extends FastNoise {
 
         public Div(final NoiseDescriptor cfg) {
             super(cfg);
+        }
+
+        public Div(final int seed) {
+            super(seed);
         }
 
         @Override

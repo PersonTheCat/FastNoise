@@ -24,6 +24,10 @@ public class OpenSimplex2SNoise extends FastNoise {
         super(cfg);
     }
 
+    public OpenSimplex2SNoise(final int seed) {
+        super(seed);
+    }
+
     @Override
     public float getNoise(final float x, final float y) {
         final float s = (x + y) * F2;

@@ -14,6 +14,10 @@ public class WhiteNoise extends FastNoise {
         super(cfg);
     }
 
+    public WhiteNoise(final int seed) {
+        super(seed);
+    }
+
     @Override
     public float getSingle(int seed, final float x) {
         final int xi = castFloatToInt(x);

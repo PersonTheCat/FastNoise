@@ -17,6 +17,10 @@ public class CubicNoise extends FastNoise {
         super(cfg);
     }
 
+    public CubicNoise(final int seed) {
+        super(seed);
+    }
+
     @Override
     public float getSingle(final int seed, final float x) {
         return 0;

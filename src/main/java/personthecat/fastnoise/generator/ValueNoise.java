@@ -10,12 +10,16 @@ import static personthecat.fastnoise.util.NoiseUtils.value3;
 
 public class ValueNoise extends FastNoise {
 
-    public ValueNoise(NoiseDescriptor cfg) {
+    public ValueNoise(final NoiseDescriptor cfg) {
         super(cfg);
     }
 
+    public ValueNoise(final int seed) {
+        super(seed);
+    }
+
     @Override
-    public float getSingle(int seed, float x) {
+    public float getSingle(final int seed, final float x) {
         return 0;
     }
 

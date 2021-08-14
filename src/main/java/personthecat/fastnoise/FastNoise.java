@@ -3,8 +3,6 @@ package personthecat.fastnoise;
 import personthecat.fastnoise.data.NoiseDescriptor;
 import personthecat.fastnoise.generator.DummyNoiseWrapper;
 
-import static personthecat.fastnoise.data.NoiseDescriptor.DEFAULT_NOISE;
-
 @SuppressWarnings("unused")
 public abstract class FastNoise {
 
@@ -38,17 +36,17 @@ public abstract class FastNoise {
 
     public FastNoise(final int seed) {
         this.seed = seed;
-        this.frequencyX = DEFAULT_NOISE.frequencyX();
-        this.frequencyY = DEFAULT_NOISE.frequencyY();
-        this.frequencyZ = DEFAULT_NOISE.frequencyZ();
-        this.offsetX = DEFAULT_NOISE.offsetX();
-        this.offsetY = DEFAULT_NOISE.offsetY();
-        this.offsetZ = DEFAULT_NOISE.offsetZ();
-        this.scaleAmplitude = DEFAULT_NOISE.scaleAmplitude();
-        this.scaleOffset = DEFAULT_NOISE.scaleOffset();
-        this.minThreshold = DEFAULT_NOISE.minThreshold();
-        this.maxThreshold = DEFAULT_NOISE.maxThreshold();
-        this.invert = DEFAULT_NOISE.invert();
+        this.frequencyX = 0.1F;
+        this.frequencyY = 0.1F;
+        this.frequencyZ = 0.1F;
+        this.offsetX = 0.0F;
+        this.offsetY = 0.0F;
+        this.offsetZ = 0.0F;
+        this.scaleAmplitude = 1.0F;
+        this.scaleOffset = 0.0F;
+        this.minThreshold = 0.0F;
+        this.maxThreshold = 1.0F;
+        this.invert = false;
     }
 
     public static NoiseDescriptor createDescriptor() {

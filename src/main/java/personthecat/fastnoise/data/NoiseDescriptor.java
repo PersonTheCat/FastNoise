@@ -1,6 +1,7 @@
 package personthecat.fastnoise.data;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode.Exclude;
 import lombok.experimental.Accessors;
 import personthecat.fastnoise.function.NoiseProvider;
 import personthecat.fastnoise.generator.*;
@@ -41,10 +42,10 @@ public class NoiseDescriptor {
     private float offsetY = 0;
     private float offsetZ = 0;
     private boolean invert = false;
-    private float scaleAmplitude = 1.0F;
-    private float scaleOffset = 0.0F;
-    private float minThreshold = 0.0F;
-    private float maxThreshold = 1.0F;
+    @Exclude private float scaleAmplitude = 1.0F;
+    @Exclude private float scaleOffset = 0.0F;
+    @Exclude private float minThreshold = 0.0F;
+    @Exclude private float maxThreshold = 1.0F;
 
     public NoiseDescriptor frequency(final float frequency) {
         this.frequencyX = this.frequencyY = this.frequencyZ = frequency;

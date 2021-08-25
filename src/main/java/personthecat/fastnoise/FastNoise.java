@@ -112,6 +112,14 @@ public abstract class FastNoise {
         return this.invert != (noise > this.minThreshold && noise < this.maxThreshold);
     }
 
+    public boolean isInThreshold(final float noise) {
+        return this.invert != (noise > this.minThreshold && noise < this.maxThreshold);
+    }
+
+    public boolean isInThreshold(final float noise, final float d) {
+        return this.invert != (noise > this.minThreshold - d && noise < this.maxThreshold + d);
+    }
+
     protected float interpolate(final float t) {
         return t * t * (3 - 2 * t);
     }

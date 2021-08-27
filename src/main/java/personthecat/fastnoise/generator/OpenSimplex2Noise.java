@@ -5,7 +5,7 @@ import personthecat.fastnoise.data.NoiseDescriptor;
 
 import static personthecat.fastnoise.util.NoiseUtils.fastFloor;
 import static personthecat.fastnoise.util.NoiseUtils.fastRound;
-import static personthecat.fastnoise.util.NoiseUtils.gradient2;
+import static personthecat.fastnoise.util.NoiseUtils.gradient2L;
 import static personthecat.fastnoise.util.NoiseUtils.gradient3;
 
 import static personthecat.fastnoise.util.NoiseValues.X_PRIME;
@@ -27,6 +27,7 @@ public class OpenSimplex2Noise extends FastNoise {
         super(seed);
     }
 
+    // Moved these calculations before frequency from FastNoiseLite. Looks better (?)
     @Override
     public float getNoise(final float x, final float y) {
         final float s = (x + y) * F2;
@@ -45,7 +46,7 @@ public class OpenSimplex2Noise extends FastNoise {
     }
 
     @Override
-    public float getSingle(final int seed, final float x, final float y) {
+    public float getSingle(final int seed, float x, float y) {
         // 2D OpenSimplex2 case uses the same algorithm as ordinary Simplex.
 
         int i = fastFloor(x);
@@ -66,7 +67,7 @@ public class OpenSimplex2Noise extends FastNoise {
         if (a <= 0) {
             n0 = 0;
         } else {
-            n0 = (a * a) * (a * a) * gradient2(seed, i, j, x0, y0);
+            n0 = (a * a) * (a * a) * gradient2L(seed, i, j, x0, y0);
         }
 
         final float c = (2 * (1 - 2 * G2) * (1 / G2 - 2)) * t + ((-2 * (1 - 2 * G2) * (1 - 2 * G2)) + a);
@@ -75,7 +76,7 @@ public class OpenSimplex2Noise extends FastNoise {
         } else {
             final float x2 = x0 + (2 * G2 - 1);
             final float y2 = y0 + (2 * G2 - 1);
-            n2 = (c * c) * (c * c) * gradient2(seed, i + X_PRIME, j + Y_PRIME, x2, y2);
+            n2 = (c * c) * (c * c) * gradient2L(seed, i + X_PRIME, j + Y_PRIME, x2, y2);
         }
 
         if (y0 > x0) {
@@ -84,7 +85,7 @@ public class OpenSimplex2Noise extends FastNoise {
             final float b = 0.5f - x1 * x1 - y1 * y1;
             if (b <= 0) n1 = 0;
             else {
-                n1 = (b * b) * (b * b) * gradient2(seed, i, j + Y_PRIME, x1, y1);
+                n1 = (b * b) * (b * b) * gradient2L(seed, i, j + Y_PRIME, x1, y1);
             }
         } else {
             final float x1 = x0 + G2 - 1;
@@ -93,7 +94,7 @@ public class OpenSimplex2Noise extends FastNoise {
             if (b <= 0) {
                 n1 = 0;
             } else {
-                n1 = (b * b) * (b * b) * gradient2(seed, i + X_PRIME, j, x1, y1);
+                n1 = (b * b) * (b * b) * gradient2L(seed, i + X_PRIME, j, x1, y1);
             }
         }
 

@@ -4,7 +4,7 @@ import personthecat.fastnoise.FastNoise;
 import personthecat.fastnoise.data.NoiseDescriptor;
 
 import static personthecat.fastnoise.util.NoiseUtils.fastFloor;
-import static personthecat.fastnoise.util.NoiseUtils.gradient2;
+import static personthecat.fastnoise.util.NoiseUtils.gradient2L;
 import static personthecat.fastnoise.util.NoiseUtils.gradient3;
 
 import static personthecat.fastnoise.util.NoiseValues.X_PRIME;
@@ -28,6 +28,7 @@ public class OpenSimplex2SNoise extends FastNoise {
         super(seed);
     }
 
+    // Moved these calculations before frequency from FastNoiseLite. Looks better (?)
     @Override
     public float getNoise(final float x, final float y) {
         final float s = (x + y) * F2;
@@ -64,45 +65,45 @@ public class OpenSimplex2SNoise extends FastNoise {
         float y0 = yi - t;
 
         float a0 = (2.0f / 3.0f) - x0 * x0 - y0 * y0;
-        float value = (a0 * a0) * (a0 * a0) * gradient2(seed, i, j, x0, y0);
+        float value = (a0 * a0) * (a0 * a0) * gradient2L(seed, i, j, x0, y0);
 
         float a1 = (2 * (1 - 2 * G2) * (1 / G2 - 2)) * t + ((-2 * (1 - 2 * G2) * (1 - 2 * G2)) + a0);
-        float x1 = x0 - 1 - 2 * G2;
-        float y1 = y0 - 1 - 2 * G2;
-        value += (a1 * a1) * (a1 * a1) * gradient2(seed, i1, j1, x1, y1);
+        float x1 = x0 - (1 - 2 * G2);
+        float y1 = y0 - (1 - 2 * G2);
+        value += (a1 * a1) * (a1 * a1) * gradient2L(seed, i1, j1, x1, y1);
 
         // Nested conditionals were faster than compact bit logic/arithmetic.
         float xmyi = xi - yi;
         if (t > G2) {
             if (xi + xmyi > 1) {
-                float x2 = x0 + 3 * G2 - 2;
-                float y2 = y0 + 3 * G2 - 1;
+                float x2 = x0 + (3 * G2 - 2);
+                float y2 = y0 + (3 * G2 - 1);
                 float a2 = (2.0f / 3.0f) - x2 * x2 - y2 * y2;
                 if (a2 > 0) {
-                    value += (a2 * a2) * (a2 * a2) * gradient2(seed, i + X_PRIME_2, j + Y_PRIME, x2, y2);
+                    value += (a2 * a2) * (a2 * a2) * gradient2L(seed, i + X_PRIME_2, j + Y_PRIME, x2, y2);
                 }
             } else {
                 float x2 = x0 + G2;
                 float y2 = y0 + G2 - 1;
                 float a2 = (2.0f / 3.0f) - x2 * x2 - y2 * y2;
                 if (a2 > 0) {
-                    value += (a2 * a2) * (a2 * a2) * gradient2(seed, i, j + Y_PRIME, x2, y2);
+                    value += (a2 * a2) * (a2 * a2) * gradient2L(seed, i, j + Y_PRIME, x2, y2);
                 }
             }
 
             if (yi - xmyi > 1) {
-                float x3 = x0 + 3 * G2 - 1;
-                float y3 = y0 + 3 * G2 - 2;
+                float x3 = x0 + (3 * G2 - 1);
+                float y3 = y0 + (3 * G2 - 2);
                 float a3 = (2.0f / 3.0f) - x3 * x3 - y3 * y3;
                 if (a3 > 0) {
-                    value += (a3 * a3) * (a3 * a3) * gradient2(seed, i + X_PRIME, j + Y_PRIME_2, x3, y3);
+                    value += (a3 * a3) * (a3 * a3) * gradient2L(seed, i + X_PRIME, j + Y_PRIME_2, x3, y3);
                 }
             } else {
                 float x3 = x0 + G2 - 1;
                 float y3 = y0 + G2;
                 float a3 = (2.0f / 3.0f) - x3 * x3 - y3 * y3;
                 if (a3 > 0) {
-                    value += (a3 * a3) * (a3 * a3) * gradient2(seed, i + X_PRIME, j, x3, y3);
+                    value += (a3 * a3) * (a3 * a3) * gradient2L(seed, i + X_PRIME, j, x3, y3);
                 }
             }
         } else {
@@ -111,14 +112,14 @@ public class OpenSimplex2SNoise extends FastNoise {
                 float y2 = y0 - G2;
                 float a2 = (2.0f / 3.0f) - x2 * x2 - y2 * y2;
                 if (a2 > 0) {
-                    value += (a2 * a2) * (a2 * a2) * gradient2(seed, i - X_PRIME, j, x2, y2);
+                    value += (a2 * a2) * (a2 * a2) * gradient2L(seed, i - X_PRIME, j, x2, y2);
                 }
             } else {
                 float x2 = x0 + G2 - 1;
                 float y2 = y0 + G2;
                 float a2 = (2.0f / 3.0f) - x2 * x2 - y2 * y2;
                 if (a2 > 0) {
-                    value += (a2 * a2) * (a2 * a2) * gradient2(seed, i + X_PRIME, j, x2, y2);
+                    value += (a2 * a2) * (a2 * a2) * gradient2L(seed, i + X_PRIME, j, x2, y2);
                 }
             }
 
@@ -127,14 +128,14 @@ public class OpenSimplex2SNoise extends FastNoise {
                 float y2 = y0 - G2 - 1;
                 float a2 = (2.0f / 3.0f) - x2 * x2 - y2 * y2;
                 if (a2 > 0) {
-                    value += (a2 * a2) * (a2 * a2) * gradient2(seed, i, j - Y_PRIME, x2, y2);
+                    value += (a2 * a2) * (a2 * a2) * gradient2L(seed, i, j - Y_PRIME, x2, y2);
                 }
             } else {
                 float x2 = x0 + G2;
                 float y2 = y0 + G2 - 1;
                 float a2 = (2.0f / 3.0f) - x2 * x2 - y2 * y2;
                 if (a2 > 0) {
-                    value += (a2 * a2) * (a2 * a2) * gradient2(seed, i, j + Y_PRIME, x2, y2);
+                    value += (a2 * a2) * (a2 * a2) * gradient2L(seed, i, j + Y_PRIME, x2, y2);
                 }
             }
         }

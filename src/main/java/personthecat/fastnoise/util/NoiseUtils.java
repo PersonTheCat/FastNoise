@@ -121,4 +121,23 @@ public class NoiseUtils {
 
         return xd * g.x + yd * g.y + zd * g.z;
     }
+
+    public static int hash2L(int seed, int xPrimed, int yPrimed) {
+        int hash = seed ^ xPrimed ^ yPrimed;
+
+        hash *= 0x27d4eb2d;
+        return hash;
+    }
+
+
+    public static float gradient2L(int seed, int xPrimed, int yPrimed, float xd, float yd) {
+        int hash = hash2(seed, xPrimed, yPrimed);
+        hash ^= hash >> 15;
+        hash &= 127 << 1;
+
+        float xg = NoiseTables.GRAD_2DL[hash];
+        float yg = NoiseTables.GRAD_2DL[hash | 1];
+
+        return xd * xg + yd * yg;
+    }
 }

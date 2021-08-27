@@ -24,6 +24,7 @@ public class NoiseViewer {
         FastNoise generator;
         final Random rand;
         boolean threshold;
+        boolean threeD;
         int x;
         int y;
         int z;
@@ -36,6 +37,7 @@ public class NoiseViewer {
             this.generator = descriptor.generate();
             this.rand = new Random();
             this.threshold = false;
+            this.threeD = true;
             this.x = 0;
             this.y = 0;
             this.z = 0;
@@ -49,7 +51,7 @@ public class NoiseViewer {
                 try {
                     this.getNextInput();
                     System.out.println();
-                } catch (final IllegalArgumentException ignored) {
+                } catch (final IllegalArgumentException e) {
                     System.err.println("Invalid argument. Try again.\n");
                 }
             }
@@ -60,6 +62,7 @@ public class NoiseViewer {
             System.out.println("i: Move up");
             System.out.println("k: Move down");
             System.out.println("t: Toggle threshold");
+            System.out.println("d: Toggle 3D / 2D");
             System.out.println("p: Print settings");
             System.out.println("<key> <value>: Set property");
             System.out.println("q: Exit");
@@ -70,6 +73,7 @@ public class NoiseViewer {
                 case "i": this.up(); break;
                 case "k": this.down(); break;
                 case "t": this.toggle(); break;
+                case "d": this.dimensions(); break;
                 case "p": System.out.println(this.descriptor + "\n" + this.generator); break;
                 case "q": System.exit(0);
                 default: this.set(command);
@@ -346,6 +350,12 @@ public class NoiseViewer {
             this.regen();
         }
 
+        void dimensions() {
+            this.threeD = !this.threeD;
+            this.regen();
+            System.out.println("Now in " + (this.threeD ? "3D" : "2D"));
+        }
+
         void regen() {
             this.generator = this.descriptor.generate();
             this.label.setIcon(new ImageIcon(this.createNextImage()));
@@ -357,10 +367,14 @@ public class NoiseViewer {
                 for (int w = 0; w < IMAGE_SIZE; w++) {
                     final int rgb;
                     if (this.threshold) {
-                        final boolean b = this.generator.getBoolean(this.x + w, this.y, this.z + h);
+                        final boolean b = this.threeD
+                            ? this.generator.getBoolean(this.x + w, this.y, this.z + h)
+                            : this.generator.getBoolean(this.x + w, this.z + h);
                         rgb = b ? Integer.MAX_VALUE : 0;
                     } else {
-                        final float n = this.generator.getNoise(this.x + w, this.y, this.z + h);
+                        final float n = this.threeD
+                            ? this.generator.getNoise(this.x + w, this.y, this.z + h)
+                            : this.generator.getNoise(this.x + w, this.z + h);
                         final int v = (int) ((1.0F + n) * 127.0F);
                         rgb = new Color(v, v, v).getRGB();
                     }

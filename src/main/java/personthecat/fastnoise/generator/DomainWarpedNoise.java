@@ -91,6 +91,11 @@ public abstract class DomainWarpedNoise extends FastNoise {
         return this.reference.getSingle(seed, x, y, z);
     }
 
+    @Override
+    public float interpolate(final float t) {
+        return t;
+    }
+
     public static class BasicGrid extends DomainWarpedNoise {
 
         public BasicGrid(final NoiseDescriptor cfg, final FastNoise reference) {
@@ -107,8 +112,8 @@ public abstract class DomainWarpedNoise extends FastNoise {
             final int x1 = x0 + 1;
             final int y1 = y0 + 1;
 
-            final float xs = this.interpolate(x - x0);
-            final float ys = this.interpolate(y - y0);
+            final float xs = this.interpolate(xf - x0);
+            final float ys = this.interpolate(yf - y0);
 
             Float2 vec0 = CELL_2D[hash2(this.seed, x0, y0) & 255];
             Float2 vec1 = CELL_2D[hash2(this.seed, x1, y0) & 255];
@@ -122,16 +127,21 @@ public abstract class DomainWarpedNoise extends FastNoise {
             final float lx1x = lerp(vec0.x, vec1.x, xs);
             final float ly1x = lerp(vec0.y, vec1.y, xs);
 
-            x += lerp(lx0x, lx1x, ys) * this.warpAmplitudeX;
-            y += lerp(ly0x, ly1x, ys) * this.warpAmplitudeY;
+            x += lerp(lx0x, lx1x, ys) * (this.warpAmplitudeX / 0.45F);
+            y += lerp(ly0x, ly1x, ys) * (this.warpAmplitudeY / 0.45F);
 
             x *= this.frequencyX;
             y *= this.frequencyY;
+
             return this.reference.getSingle(this.seed, x, y);
         }
 
         @Override
         public float getNoise(float x, float y, float z) {
+            x += this.offsetX;
+            y += this.offsetY;
+            z += this.offsetZ;
+
             final float xf = x * this.warpFrequencyX;
             final float yf = y * this.warpFrequencyY;
             final float zf = z * this.warpFrequencyZ;
@@ -179,17 +189,14 @@ public abstract class DomainWarpedNoise extends FastNoise {
             ly1x = lerp(vec0.y, vec1.y, xs);
             lz1x = lerp(vec0.z, vec1.z, xs);
 
-            x += lerp(lx0y, lerp(lx0x, lx1x, ys), zs) * this.warpAmplitudeX;
-            y += lerp(ly0y, lerp(ly0x, ly1x, ys), zs) * this.warpAmplitudeY;
-            z += lerp(lz0y, lerp(lz0x, lz1x, ys), zs) * this.warpAmplitudeZ;
-
-            x += this.offsetX;
-            y += this.offsetY;
-            z += this.offsetZ;
+            x += lerp(lx0y, lerp(lx0x, lx1x, ys), zs) * (this.warpAmplitudeX / 0.45F);
+            y += lerp(ly0y, lerp(ly0x, ly1x, ys), zs) * (this.warpAmplitudeY / 0.45F);
+            z += lerp(lz0y, lerp(lz0x, lz1x, ys), zs) * (this.warpAmplitudeZ / 0.45F);
 
             x *= this.frequencyX;
             y *= this.frequencyY;
             z *= this.frequencyZ;
+
             return this.reference.getSingle(this.seed, x, y, z);
         }
     }
@@ -311,7 +318,7 @@ public abstract class DomainWarpedNoise extends FastNoise {
         public float getNoise(float x, float y, float z) {
             float xr = x * this.warpFrequencyX;
             float yr = y * this.warpFrequencyY;
-            float zr = y * this.warpFrequencyZ;
+            float zr = z * this.warpFrequencyZ;
 
             final float r = (xr + yr + zr) * R3; // Rotation, not skew
             xr = r - xr;
@@ -433,9 +440,9 @@ public abstract class DomainWarpedNoise extends FastNoise {
             y += this.offsetY;
             z += this.offsetZ;
 
-            x += vx * this.warpAmplitudeX * 32.69428253173828125f;
-            y += vy * this.warpAmplitudeY * 32.69428253173828125f;
-            z += vz * this.warpAmplitudeZ * 32.69428253173828125f;
+            x += vx * (this.warpAmplitudeX * 32.69428253173828125f);
+            y += vy * (this.warpAmplitudeY * 32.69428253173828125f);
+            z += vz * (this.warpAmplitudeZ * 32.69428253173828125f);
 
             x *= this.frequencyX;
             y *= this.frequencyY;
@@ -531,7 +538,7 @@ public abstract class DomainWarpedNoise extends FastNoise {
         public float getNoise(float x, float y, float z) {
             float xr = x * this.warpFrequencyX;
             float yr = y * this.warpFrequencyY;
-            float zr = y * this.warpFrequencyZ;
+            float zr = z * this.warpFrequencyZ;
 
             final float r = (xr + yr + zr) * R3; // Rotation, not skew
             xr = r - xr;
@@ -625,9 +632,9 @@ public abstract class DomainWarpedNoise extends FastNoise {
             y += this.offsetY;
             z += this.offsetZ;
 
-            x += vx * this.warpAmplitudeX * 7.71604938271605f;
-            y += vy * this.warpAmplitudeY * 7.71604938271605f;
-            z += vz * this.warpAmplitudeZ * 7.71604938271605f;
+            x += vx * (this.warpAmplitudeX * 7.71604938271605f);
+            y += vy * (this.warpAmplitudeY * 7.71604938271605f);
+            z += vz * (this.warpAmplitudeZ * 7.71604938271605f);
 
             x *= this.frequencyX;
             y *= this.frequencyY;

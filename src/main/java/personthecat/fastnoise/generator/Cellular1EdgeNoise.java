@@ -259,12 +259,12 @@ public abstract class Cellular1EdgeNoise extends FastNoise {
 
         @Override
         protected float getReturn(final int x, final int y, final float distance) {
-            return 0;
+            return distance - 1;
         }
 
         @Override
         protected float getReturn(final int x, final int y, final int z, final float distance) {
-            return 0;
+            return distance - 1;
         }
     }
 }

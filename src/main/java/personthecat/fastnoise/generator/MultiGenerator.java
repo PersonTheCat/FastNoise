@@ -20,6 +20,21 @@ public abstract class MultiGenerator extends FastNoise {
         return compiled;
     }
 
+    @Override
+    public float getNoise(final float x) {
+        return this.getSingle(this.seed, x);
+    }
+
+    @Override
+    public float getNoise(final float x, final float y) {
+        return this.getSingle(this.seed, x, y);
+    }
+
+    @Override
+    public float getNoise(final float x, final float y, final float z) {
+        return this.getSingle(this.seed, x, y, z);
+    }
+
     public static class Min extends MultiGenerator {
 
         public Min(final NoiseDescriptor cfg) {

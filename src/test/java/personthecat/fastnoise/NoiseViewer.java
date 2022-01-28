@@ -378,6 +378,7 @@ public class NoiseViewer {
             for (final String value : this.descriptor.toString().split(",\\s?")) {
                 System.out.println(value);
             }
+            System.out.println("Class: " + this.generator.getClass());
         }
 
         void regen() {

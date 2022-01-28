@@ -5,6 +5,8 @@ import personthecat.fastnoise.data.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -19,8 +21,9 @@ public class NoiseViewer {
     }
 
     private static class Context {
+        final List<NoiseDescriptor> lookups = new ArrayList<>();
         final Scanner scanner;
-        final NoiseDescriptor descriptor;
+        NoiseDescriptor descriptor;
         FastNoise generator;
         final Random rand;
         boolean threshold;
@@ -63,6 +66,8 @@ public class NoiseViewer {
             System.out.println("k: Move down");
             System.out.println("t: Toggle threshold");
             System.out.println("d: Toggle 3D / 2D");
+            System.out.println("s: Store as lookup");
+            System.out.println("a: Apply lookups from storage");
             System.out.println("p: Print settings");
             System.out.println("<key> <value>: Set property");
             System.out.println("q: Exit");
@@ -74,6 +79,8 @@ public class NoiseViewer {
                 case "k": this.down(); break;
                 case "t": this.toggle(); break;
                 case "d": this.dimensions(); break;
+                case "s": this.storeLookup(); break;
+                case "a": this.applyLookups(); break;
                 case "p": System.out.println(this.descriptor + "\n" + this.generator); break;
                 case "q": System.exit(0);
                 default: this.set(command);
@@ -354,6 +361,17 @@ public class NoiseViewer {
             this.threeD = !this.threeD;
             this.regen();
             System.out.println("Now in " + (this.threeD ? "3D" : "2D"));
+        }
+
+        void storeLookup() {
+            this.lookups.add(this.descriptor);
+            System.out.println("Added current settings to storage. Values were reset.");
+            this.descriptor = new NoiseDescriptor();
+        }
+
+        void applyLookups() {
+            this.descriptor.noiseLookup(this.lookups);
+            System.out.println("Lookups applied. Set type to multi or cell value to use.");
         }
 
         void regen() {

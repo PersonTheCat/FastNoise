@@ -387,10 +387,16 @@ public class NoiseViewer {
         void storeLookup() {
             this.lookups.add(this.descriptor);
             System.out.println("Added current settings to storage. Values were reset.");
+            System.out.println("You now have " + this.lookups.size() + " lookups in storage.");
             this.descriptor = new NoiseDescriptor();
+            this.regen();
         }
 
         void applyLookups() {
+            System.out.println("Lookups in storage:");
+            for (final NoiseDescriptor lookup : this.lookups) {
+                System.out.println(" * " + lookup);
+            }
             this.descriptor.noiseLookup(this.lookups);
             System.out.println("Lookups applied. Set type to multi or cell value to use.");
         }

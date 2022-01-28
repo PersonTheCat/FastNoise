@@ -4,6 +4,8 @@ A rewrite of the legacy [FastNoise_Java](https://github.com/Auburn/FastNoise_Jav
 original, this library is highly extensible. It provides concrete implementations for each of the original
 FastNoise generators and even includes a few of the newer features from FastNoiseLite.
 
+**Note that this API is currently unstable and will change in a future release**.
+
 # Motivations and Goals
 
 It is my hope that this library will facilitate generation of custom, highly-optimized noise generators.

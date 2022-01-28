@@ -5,23 +5,20 @@ import personthecat.fastnoise.util.EnumNamingService;
 
 import java.util.regex.Pattern;
 
-public enum NoiseType {
-    VALUE,
-    PERLIN,
-    SIMPLEX,
-    SIMPLEX2,
-    SIMPLEX2S,
-    CELLULAR,
-    WHITE_NOISE,
-    CUBIC,
-    MULTI;
+public enum MultiType {
+    MIN,
+    MAX,
+    AVG,
+    MUL,
+    DIV,
+    SUM;
 
     final Pattern pattern = EnumNamingService.createPattern(this);
     final String formatted = EnumNamingService.formatName(this);
 
     @Nullable
-    public static NoiseType from(final String s) {
-        for (final NoiseType t : values()) {
+    public static MultiType from(final String s) {
+        for (final MultiType t : values()) {
             if (t.pattern.matcher(s).matches()) {
                 return t;
             }

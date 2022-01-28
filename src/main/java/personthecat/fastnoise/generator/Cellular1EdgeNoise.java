@@ -224,8 +224,8 @@ public abstract class Cellular1EdgeNoise extends FastNoise {
 
         public NoiseLookup(final NoiseDescriptor cfg) {
             super(cfg);
-            this.lookup = cfg.noiseLookup() != null
-                ? cfg.noiseLookup().generate()
+            this.lookup = cfg.noiseLookup().length > 0
+                ? cfg.noiseLookup()[0].generate()
                 : new NoiseDescriptor().generate();
         }
 

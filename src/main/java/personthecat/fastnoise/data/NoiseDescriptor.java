@@ -7,6 +7,8 @@ import personthecat.fastnoise.function.NoiseProvider;
 import personthecat.fastnoise.generator.*;
 import personthecat.fastnoise.FastNoise;
 
+import java.util.Collection;
+
 @Data
 @Accessors(fluent = true)
 @SuppressWarnings({"unused", "UnusedReturnValue"})
@@ -18,7 +20,8 @@ public class NoiseDescriptor {
     private DomainWarpType warp = DomainWarpType.NONE;
     private CellularDistanceType distance = CellularDistanceType.EUCLIDEAN;
     private CellularReturnType cellularReturn = CellularReturnType.CELL_VALUE;
-    private NoiseDescriptor noiseLookup = null;
+    private NoiseDescriptor[] noiseLookup = {};
+    private MultiType multi;
     private int seed = 1337;
     private float frequencyX = 0.01F;
     private float frequencyY = 0.01F;
@@ -46,6 +49,25 @@ public class NoiseDescriptor {
     @Exclude private float scaleOffset = 0.0F;
     @Exclude private float minThreshold = 0.0F;
     @Exclude private float maxThreshold = 1.0F;
+
+    public NoiseDescriptor[] noiseLookup() {
+        return this.noiseLookup;
+    }
+
+    public NoiseDescriptor noiseLookup(final NoiseDescriptor lookup) {
+        this.noiseLookup = new NoiseDescriptor[] { lookup };
+        return this;
+    }
+
+    public NoiseDescriptor noiseLookup(final NoiseDescriptor... references) {
+        this.noiseLookup = references;
+        return this;
+    }
+
+    public NoiseDescriptor noiseLookup(final Collection<NoiseDescriptor> references) {
+        this.noiseLookup = references.toArray(new NoiseDescriptor[0]);
+        return this;
+    }
 
     public NoiseDescriptor frequency(final float frequency) {
         this.frequencyX = this.frequencyY = this.frequencyZ = frequency;
@@ -111,7 +133,8 @@ public class NoiseDescriptor {
             case SIMPLEX2S: return new OpenSimplex2SNoise(this);
             case CELLULAR: return this.getCellularGenerator();
             case WHITE_NOISE: return new WhiteNoise(this);
-            default: return new CubicNoise(this);
+            case CUBIC: return new CubicNoise(this);
+            default : return this.getMultiGenerator();
         }
     }
 
@@ -129,6 +152,20 @@ public class NoiseDescriptor {
             case DISTANCE3_SUB: return new Cellular3EdgeNoise.Sub(this);
             case DISTANCE3_MUL: return new Cellular3EdgeNoise.Mul(this);
             default: return new Cellular3EdgeNoise.Div(this);
+        }
+    }
+
+    private FastNoise getMultiGenerator() {
+        if (this.noiseLookup.length == 0) {
+            this.noiseLookup = new NoiseDescriptor[] { new NoiseDescriptor() };
+        }
+        switch (this.multi) {
+            case MIN: return new MultiGenerator.Min(this);
+            case MAX: return new MultiGenerator.Max(this);
+            case AVG: return new MultiGenerator.Avg(this);
+            case MUL: return new MultiGenerator.Mul(this);
+            case DIV: return new MultiGenerator.Div(this);
+            default: return new MultiGenerator.Sum(this);
         }
     }
 

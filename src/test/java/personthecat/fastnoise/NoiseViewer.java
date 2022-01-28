@@ -81,7 +81,7 @@ public class NoiseViewer {
                 case "d": this.dimensions(); break;
                 case "s": this.storeLookup(); break;
                 case "a": this.applyLookups(); break;
-                case "p": System.out.println(this.descriptor + "\n" + this.generator); break;
+                case "p": this.print(); break;
                 case "q": System.exit(0);
                 default: this.set(command);
             }
@@ -372,6 +372,12 @@ public class NoiseViewer {
         void applyLookups() {
             this.descriptor.noiseLookup(this.lookups);
             System.out.println("Lookups applied. Set type to multi or cell value to use.");
+        }
+
+        void print() {
+            for (final String value : this.descriptor.toString().split(",\\s?")) {
+                System.out.println(value);
+            }
         }
 
         void regen() {

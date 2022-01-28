@@ -13,6 +13,9 @@ import java.util.Scanner;
 public class NoiseViewer {
 
     private static final int IMAGE_SIZE = 500;
+    private static final int IMAGE_CENTER = IMAGE_SIZE / 2;
+    private static final int LINE_WIDTH = 3;
+    private static final int DEFAULT_SCALE = 3;
     private static final int PAGE_SIZE = 5;
     private static final int COORDINATE_RANGE = 1 << 16;
 
@@ -26,7 +29,8 @@ public class NoiseViewer {
         NoiseDescriptor descriptor;
         FastNoise generator;
         final Random rand;
-        boolean threshold;
+        DrawMode mode;
+        int scale;
         boolean threeD;
         int x;
         int y;
@@ -39,7 +43,8 @@ public class NoiseViewer {
             this.descriptor = new NoiseDescriptor();
             this.generator = descriptor.generate();
             this.rand = new Random();
-            this.threshold = false;
+            this.mode = DrawMode.STANDARD;
+            this.scale = DEFAULT_SCALE;
             this.threeD = true;
             this.x = 0;
             this.y = 0;
@@ -64,11 +69,12 @@ public class NoiseViewer {
             System.out.println("n: New image");
             System.out.println("i: Move up");
             System.out.println("k: Move down");
-            System.out.println("t: Toggle threshold");
+            System.out.println("t: Toggle threshold / standard / line mode");
             System.out.println("d: Toggle 3D / 2D");
             System.out.println("s: Store as lookup");
             System.out.println("a: Apply lookups from storage");
             System.out.println("p: Print settings");
+            System.out.println("scale <num>: Update 1D scale (for line mode)");
             System.out.println("<key> <value>: Set property");
             System.out.println("q: Exit");
 
@@ -121,6 +127,10 @@ public class NoiseViewer {
             final String value = length > 1 ? args[1] : null;
 
             switch (key) {
+                case "scale":
+                    if (length == 1) { System.out.println(this.scale); return; }
+                    this.scale = Integer.parseInt(value);
+                    break;
                 case "noise":
                     if (length == 1) { System.out.println(this.descriptor.noise()); return; }
                     final NoiseType noise = NoiseType.from(value);
@@ -359,7 +369,12 @@ public class NoiseViewer {
         }
 
         void toggle() {
-            this.threshold = !this.threshold;
+            switch (this.mode) {
+                case STANDARD: this.mode = DrawMode.THRESHOLD; break;
+                case THRESHOLD: this.mode = DrawMode.LINE; break;
+                case LINE: this.mode = DrawMode.STANDARD;
+            }
+            System.out.println("In " + this.mode.name().toLowerCase() + " mode");
             this.regen();
         }
 
@@ -394,25 +409,49 @@ public class NoiseViewer {
 
         BufferedImage createNextImage() {
             final BufferedImage image = createBlankImage();
-            for (int h = 0; h < IMAGE_SIZE; h++) {
-                for (int w = 0; w < IMAGE_SIZE; w++) {
-                    final int rgb;
-                    if (this.threshold) {
-                        final boolean b = this.threeD
-                            ? this.generator.getBoolean(this.x + w, this.y, this.z + h)
-                            : this.generator.getBoolean(this.x + w, this.z + h);
-                        rgb = b ? Integer.MAX_VALUE : 0;
-                    } else {
-                        final float n = this.threeD
-                            ? this.generator.getNoise(this.x + w, this.y, this.z + h)
-                            : this.generator.getNoise(this.x + w, this.z + h);
-                        final int v = (int) ((1.0F + n) * 127.0F);
-                        rgb = new Color(v, v, v).getRGB();
-                    }
-                    image.setRGB(w, h, rgb);
-                }
+            switch (this.mode) {
+                case STANDARD: this.drawStandard(image); break;
+                case THRESHOLD: this.drawThreshold(image); break;
+                default: this.drawLine(image);
             }
             return image;
+        }
+
+        void drawStandard(final BufferedImage image) {
+            for (int h = 0; h < IMAGE_SIZE; h++) {
+                for (int w = 0; w < IMAGE_SIZE; w++) {
+                    final float n = this.threeD
+                        ? this.generator.getNoise(this.x + w, this.y, this.z + h)
+                        : this.generator.getNoise(this.x + w, this.z + h);
+                    final int v = (int) ((1.0F + n) * 127.0F);
+                    image.setRGB(w, h, new Color(v, v, v).getRGB());
+                }
+            }
+        }
+
+        void drawThreshold(final BufferedImage image) {
+            for (int h = 0; h < IMAGE_SIZE; h++) {
+                for (int w = 0; w < IMAGE_SIZE; w++) {
+                    final boolean b = this.threeD
+                        ? this.generator.getBoolean(this.x + w, this.y, this.z + h)
+                        : this.generator.getBoolean(this.x + w, this.z + h);
+                    image.setRGB(w, h, b ? Integer.MAX_VALUE : 0);
+                }
+            }
+        }
+
+        void drawLine(final BufferedImage image) {
+            final int increment = IMAGE_SIZE / (this.scale * 2);
+            for (int w = 0; w < IMAGE_SIZE; w++) {
+                final float v = this.generator.getNoiseScaled(w);
+                final int y = IMAGE_CENTER + (int) (v * increment);
+
+                if (y < IMAGE_SIZE - LINE_WIDTH) {
+                    for (int h = y; h < y + LINE_WIDTH; h++) {
+                        image.setRGB(w, h, Integer.MAX_VALUE);
+                    }
+                }
+            }
         }
 
         JLabel createLabel() {
@@ -431,5 +470,11 @@ public class NoiseViewer {
             frame.setVisible(true);
             return frame;
         }
+    }
+
+    private enum DrawMode {
+        STANDARD,
+        THRESHOLD,
+        LINE
     }
 }

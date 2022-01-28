@@ -21,7 +21,7 @@ public class NoiseDescriptor {
     private CellularDistanceType distance = CellularDistanceType.EUCLIDEAN;
     private CellularReturnType cellularReturn = CellularReturnType.CELL_VALUE;
     private NoiseDescriptor[] noiseLookup = {};
-    private MultiType multi = MultiType.MAX;
+    private MultiType multi = MultiType.SUM;
     private int seed = 1337;
     private float frequencyX = 0.01F;
     private float frequencyY = 0.01F;

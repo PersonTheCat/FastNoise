@@ -49,7 +49,7 @@ public abstract class Cellular2EdgeNoise extends FastNoise {
 
     @Override
     public float getSingle(int seed, float x) {
-        return 0;
+        return this.getSingle(seed, x, 1337);
     }
 
     @Override

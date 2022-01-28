@@ -23,7 +23,7 @@ public class CubicNoise extends FastNoise {
 
     @Override
     public float getSingle(final int seed, final float x) {
-        return 0;
+        return this.getSingle(seed, x, 1337);
     }
 
     @Override

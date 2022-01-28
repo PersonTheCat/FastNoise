@@ -151,6 +151,12 @@ public class NoiseViewer {
                     if (cellularReturn == null) throw new IllegalArgumentException();
                     this.descriptor.cellularReturn(cellularReturn);
                     break;
+                case "multi":
+                    if (length == 1) { System.out.println(this.descriptor.multi()); return; }
+                    final MultiType multi = MultiType.from(value);
+                    if (multi == null) throw new IllegalArgumentException();
+                    this.descriptor.multi(multi);
+                    break;
                 case "seed":
                     if (length == 1) { System.out.println(this.descriptor.seed()); return; }
                     this.descriptor.seed(Integer.parseInt(value));

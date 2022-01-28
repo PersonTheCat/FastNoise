@@ -21,18 +21,18 @@ public abstract class MultiGenerator extends FastNoise {
     }
 
     @Override
-    public float getNoise(final float x) {
-        return this.getSingle(this.seed, x);
+    public float getSingle(final int seed, final float x) {
+        return 0F;
     }
 
     @Override
-    public float getNoise(final float x, final float y) {
-        return this.getSingle(this.seed, x, y);
+    public float getSingle(final int seed, final float x, final float y) {
+        return 0F;
     }
 
     @Override
-    public float getNoise(final float x, final float y, final float z) {
-        return this.getSingle(this.seed, x, y, z);
+    public float getSingle(final int seed, final float x, final float y, final float z) {
+        return 0F;
     }
 
     public static class Min extends MultiGenerator {
@@ -42,28 +42,28 @@ public abstract class MultiGenerator extends FastNoise {
         }
 
         @Override
-        public float getSingle(final int seed, final float x) {
+        public float getNoise(final float x) {
             float min = 1;
             for (final FastNoise reference : this.references) {
-                min = Math.min(min, reference.getSingle(seed, x));
+                min = Math.min(min, reference.getNoise(x));
             }
             return min;
         }
 
         @Override
-        public float getSingle(final int seed, final float x, final float y) {
+        public float getNoise(final float x, final float y) {
             float min = 1;
             for (final FastNoise reference : this.references) {
-                min = Math.min(min, reference.getSingle(seed, x, y));
+                min = Math.min(min, reference.getNoise(x, y));
             }
             return min;
         }
 
         @Override
-        public float getSingle(final int seed, final float x, final float y, final float z) {
+        public float getNoise(final float x, final float y, final float z) {
             float min = 1;
             for (final FastNoise reference : this.references) {
-                min = Math.min(min, reference.getSingle(seed, x, y, z));
+                min = Math.min(min, reference.getNoise(x, y, z));
             }
             return min;
         }
@@ -76,28 +76,28 @@ public abstract class MultiGenerator extends FastNoise {
         }
 
         @Override
-        public float getSingle(final int seed, final float x) {
+        public float getNoise(final float x) {
             float max = -1;
             for (final FastNoise reference : this.references) {
-                max = Math.max(max, reference.getSingle(seed, x));
+                max = Math.max(max, reference.getNoise(x));
             }
             return max;
         }
 
         @Override
-        public float getSingle(final int seed, final float x, final float y) {
+        public float getNoise(final float x, final float y) {
             float max = -1;
             for (final FastNoise reference : this.references) {
-                max = Math.max(max, reference.getSingle(seed, x, y));
+                max = Math.max(max, reference.getNoise(x, y));
             }
             return max;
         }
 
         @Override
-        public float getSingle(final int seed, final float x, final float y, final float z) {
+        public float getNoise(final float x, final float y, final float z) {
             float max = -1;
             for (final FastNoise reference : this.references) {
-                max = Math.max(max, reference.getSingle(seed, x, y, z));
+                max = Math.max(max, reference.getNoise(x, y, z));
             }
             return max;
         }
@@ -110,28 +110,28 @@ public abstract class MultiGenerator extends FastNoise {
         }
 
         @Override
-        public float getSingle(final int seed, final float x) {
+        public float getNoise(final float x) {
             float max = 0;
             for (final FastNoise reference : this.references) {
-                max = Math.max(max, reference.getSingle(seed, x));
+                max = Math.max(max, reference.getNoise(x));
             }
             return max / this.references.length;
         }
 
         @Override
-        public float getSingle(final int seed, final float x, final float y) {
+        public float getNoise(final float x, final float y) {
             float max = 0;
             for (final FastNoise reference : this.references) {
-                max = Math.max(max, reference.getSingle(seed, x, y));
+                max = Math.max(max, reference.getNoise(x, y));
             }
             return max / this.references.length;
         }
 
         @Override
-        public float getSingle(final int seed, final float x, final float y, final float z) {
+        public float getNoise(final float x, final float y, final float z) {
             float max = 0;
             for (final FastNoise reference : this.references) {
-                max = Math.max(max, reference.getSingle(seed, x, y, z));
+                max = Math.max(max, reference.getNoise(x, y, z));
             }
             return max / this.references.length;
         }
@@ -144,28 +144,28 @@ public abstract class MultiGenerator extends FastNoise {
         }
 
         @Override
-        public float getSingle(final int seed, final float x) {
-            float out = this.references[0].getSingle(seed, x);
+        public float getNoise(final float x) {
+            float out = this.references[0].getNoise(x);
             for (int i = 1; i < this.references.length; i++) {
-                out *= this.references[i].getSingle(seed, x);
+                out *= this.references[i].getNoise(x);
             }
             return Math.max(-1, Math.min(1, out));
         }
 
         @Override
-        public float getSingle(final int seed, final float x, final float y) {
-            float out = this.references[0].getSingle(seed, x);
+        public float getNoise(final float x, final float y) {
+            float out = this.references[0].getNoise(x);
             for (int i = 1; i < this.references.length; i++) {
-                out *= this.references[i].getSingle(seed, x, y);
+                out *= this.references[i].getNoise(x, y);
             }
             return Math.max(-1, Math.min(1, out));
         }
 
         @Override
-        public float getSingle(final int seed, final float x, final float y, final float z) {
-            float out = this.references[0].getSingle(seed, x);
+        public float getNoise(final float x, final float y, final float z) {
+            float out = this.references[0].getNoise(x);
             for (int i = 1; i < this.references.length; i++) {
-                out *= this.references[i].getSingle(seed, x, 0);
+                out *= this.references[i].getNoise(x, 0);
             }
             return Math.max(-1, Math.min(1, out));
         }
@@ -205,10 +205,10 @@ public abstract class MultiGenerator extends FastNoise {
         }
 
         @Override
-        public float getSingle(final int seed, final float x) {
-            float out = this.references[0].getSingle(seed, x);
+        public float getNoise(final float x) {
+            float out = this.references[0].getNoise(x);
             for (int i = 1; i < this.references.length; i++) {
-                float value = this.references[i].getSingle(seed, x);
+                float value = this.references[i].getNoise(x);
                 if (value != 0) {
                     out /= value;
                 }
@@ -217,10 +217,10 @@ public abstract class MultiGenerator extends FastNoise {
         }
 
         @Override
-        public float getSingle(final int seed, final float x, final float y) {
-            float out = this.references[0].getSingle(seed, x);
+        public float getNoise(final float x, final float y) {
+            float out = this.references[0].getNoise(x);
             for (int i = 1; i < this.references.length; i++) {
-                float value = this.references[i].getSingle(seed, x, y);
+                float value = this.references[i].getNoise(x, y);
                 if (value != 0) {
                     out /= value;
                 }
@@ -229,10 +229,10 @@ public abstract class MultiGenerator extends FastNoise {
         }
 
         @Override
-        public float getSingle(final int seed, final float x, final float y, final float z) {
-            float out = this.references[0].getSingle(seed, x);
+        public float getNoise(final float x, final float y, final float z) {
+            float out = this.references[0].getNoise(x);
             for (int i = 1; i < this.references.length; i++) {
-                float value = this.references[i].getSingle(seed, x, 0);
+                float value = this.references[i].getNoise(x, 0);
                 if (value != 0) {
                     out /= value;
                 }
@@ -284,28 +284,28 @@ public abstract class MultiGenerator extends FastNoise {
         }
 
         @Override
-        public float getSingle(final int seed, final float x) {
+        public float getNoise(final float x) {
             float sum = 0;
             for (final FastNoise reference : this.references) {
-                sum += reference.getSingle(seed, x);
+                sum += reference.getNoise(x);
             }
             return Math.max(-1, Math.min(1, sum));
         }
 
         @Override
-        public float getSingle(final int seed, final float x, final float y) {
+        public float getNoise(final float x, final float y) {
             float sum = 0;
             for (final FastNoise reference : this.references) {
-                sum += reference.getSingle(seed, x, y);
+                sum += reference.getNoise(x, y);
             }
             return Math.max(-1, Math.min(1, sum));
         }
 
         @Override
-        public float getSingle(final int seed, final float x, final float y, final float z) {
+        public float getNoise(final float x, final float y, final float z) {
             float sum = 0;
             for (final FastNoise reference : this.references) {
-                sum += reference.getSingle(seed, x, y, z);
+                sum += reference.getNoise(x, y, z);
             }
             return Math.max(-1, Math.min(1, sum));
         }

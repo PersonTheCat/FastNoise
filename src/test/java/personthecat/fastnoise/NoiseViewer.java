@@ -449,7 +449,7 @@ public class NoiseViewer {
         void drawLine(final BufferedImage image) {
             final int increment = IMAGE_SIZE / (this.scale * 2);
             for (int w = 0; w < IMAGE_SIZE; w++) {
-                final float v = this.generator.getNoiseScaled(w);
+                final float v = this.generator.getNoiseScaled(this.x + w);
                 final int y = IMAGE_CENTER + (int) (v * increment);
 
                 if (y < IMAGE_SIZE - LINE_WIDTH) {

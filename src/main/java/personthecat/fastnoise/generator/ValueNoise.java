@@ -5,6 +5,7 @@ import personthecat.fastnoise.data.NoiseDescriptor;
 
 import static personthecat.fastnoise.util.NoiseUtils.fastFloor;
 import static personthecat.fastnoise.util.NoiseUtils.lerp;
+import static personthecat.fastnoise.util.NoiseUtils.value1;
 import static personthecat.fastnoise.util.NoiseUtils.value2;
 import static personthecat.fastnoise.util.NoiseUtils.value3;
 
@@ -20,7 +21,12 @@ public class ValueNoise extends FastNoise {
 
     @Override
     public float getSingle(final int seed, final float x) {
-        return this.getSingle(seed, x, 1337);
+        int x0 = fastFloor(x);
+        int x1 = x0 + 1;
+
+        final float xs = this.interpolate(x - x0);
+
+        return lerp(value1(seed, x0), value1(seed, x1), xs);
     }
 
     @Override

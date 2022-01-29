@@ -74,8 +74,11 @@ public class NoiseUtils {
         return hash;
     }
 
-    public static float value1(final int seed, final float x) {
-        return (seed & 1) == 0 ? x : -x;
+    public static float value1(final int seed, final int x) {
+        int n = seed;
+        n ^= X_PRIME * x;
+
+        return (n * n * n * 60493) / (float) 2147483648.0;
     }
 
     public static float value2(final int seed, final int x, final int y) {

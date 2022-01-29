@@ -4,6 +4,7 @@ import personthecat.fastnoise.FastNoise;
 import personthecat.fastnoise.data.NoiseDescriptor;
 
 import static personthecat.fastnoise.util.NoiseUtils.fastFloor;
+import static personthecat.fastnoise.util.NoiseUtils.gradient1;
 import static personthecat.fastnoise.util.NoiseUtils.gradient2;
 import static personthecat.fastnoise.util.NoiseUtils.gradient3;
 import static personthecat.fastnoise.util.NoiseUtils.lerp;
@@ -21,12 +22,13 @@ public class PerlinNoise extends FastNoise {
 
     @Override
     public final float getSingle(final int seed, float x) {
-        x -= fastFloor(x);
+        final int x0 = fastFloor(x);
+        final float xd0 = x - x0;
 
-        final float u = this.interpolate(x);
-        float gradA = value1(seed, x);
-        float gradB = value1(seed + 1, x - 1);
-        return lerp(u, gradA, gradB);
+        final float xs = this.interpolate(xd0);
+        final float gradA = gradient1(seed, x0, xd0);
+        final float gradB = gradient1(seed, x0 + 1, xd0 - 1);
+        return lerp(gradA, gradB, xs);
     }
 
     @Override

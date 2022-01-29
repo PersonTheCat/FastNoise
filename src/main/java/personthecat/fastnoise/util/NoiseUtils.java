@@ -95,6 +95,16 @@ public class NoiseUtils {
         return (n * n * n * 60493) / (float) 2147483648.0;
     }
 
+    public static float gradient1(final int seed, final int x, final float xd) {
+        int hash = seed;
+        hash ^= X_PRIME * x;
+
+        hash = hash * hash * hash * 60493;
+        hash = (hash >> 13) ^ hash;
+
+        return xd * NoiseTables.GRAD_2DL[hash & 255];
+    }
+
     public static float gradient2(final int seed, final int x, final int y, final float xd, final float yd) {
         int hash = seed;
         hash ^= X_PRIME * x;

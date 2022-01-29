@@ -452,7 +452,7 @@ public class NoiseViewer {
                 final float v = this.generator.getNoiseScaled(this.x + w);
                 final int y = IMAGE_CENTER + (int) (v * increment);
 
-                if (y < IMAGE_SIZE - LINE_WIDTH) {
+                if (y > LINE_WIDTH && y < IMAGE_SIZE - LINE_WIDTH) {
                     for (int h = y; h < y + LINE_WIDTH; h++) {
                         image.setRGB(w, h, Integer.MAX_VALUE);
                     }

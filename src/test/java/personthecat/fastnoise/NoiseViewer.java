@@ -454,7 +454,7 @@ public class NoiseViewer {
 
                 if (y > LINE_WIDTH && y < IMAGE_SIZE - LINE_WIDTH) {
                     for (int h = y; h < y + LINE_WIDTH; h++) {
-                        image.setRGB(w, h, Integer.MAX_VALUE);
+                        image.setRGB(w, IMAGE_SIZE - h, Integer.MAX_VALUE);
                     }
                 }
             }

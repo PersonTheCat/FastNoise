@@ -15,6 +15,7 @@ public class NoiseViewer {
     private static final int IMAGE_SIZE = 500;
     private static final int IMAGE_CENTER = IMAGE_SIZE / 2;
     private static final int LINE_WIDTH = 3;
+    private static final int CENTER_LINE_COLOR = -12566464;
     private static final int DEFAULT_SCALE = 3;
     private static final int PAGE_SIZE = 5;
     private static final int COORDINATE_RANGE = 1 << 16;
@@ -451,6 +452,8 @@ public class NoiseViewer {
             for (int w = 0; w < IMAGE_SIZE; w++) {
                 final float v = this.generator.getNoiseScaled(this.x + w);
                 final int y = IMAGE_CENTER + (int) (v * increment);
+
+                image.setRGB(w, IMAGE_CENTER, CENTER_LINE_COLOR);
 
                 if (y > LINE_WIDTH && y < IMAGE_SIZE - LINE_WIDTH) {
                     for (int h = y; h < y + LINE_WIDTH; h++) {

@@ -8,7 +8,6 @@ import static personthecat.fastnoise.util.NoiseUtils.gradient1;
 import static personthecat.fastnoise.util.NoiseUtils.gradient2;
 import static personthecat.fastnoise.util.NoiseUtils.gradient3;
 import static personthecat.fastnoise.util.NoiseUtils.lerp;
-import static personthecat.fastnoise.util.NoiseUtils.value1;
 
 public class PerlinNoise extends FastNoise {
 
@@ -28,7 +27,7 @@ public class PerlinNoise extends FastNoise {
         final float xs = this.interpolate(xd0);
         final float gradA = gradient1(seed, x0, xd0);
         final float gradB = gradient1(seed, x0 + 1, xd0 - 1);
-        return lerp(gradA, gradB, xs);
+        return 2.08841887664F * lerp(gradA, gradB, xs);
     }
 
     @Override

@@ -4,6 +4,7 @@ import personthecat.fastnoise.FastNoise;
 import personthecat.fastnoise.data.NoiseDescriptor;
 
 import static personthecat.fastnoise.util.NoiseUtils.fastFloor;
+import static personthecat.fastnoise.util.NoiseUtils.gradient1;
 import static personthecat.fastnoise.util.NoiseUtils.gradient2;
 import static personthecat.fastnoise.util.NoiseUtils.gradient3;
 
@@ -25,7 +26,22 @@ public class SimplexNoise extends FastNoise {
 
     @Override
     public float getSingle(int seed, float x) {
-        return this.getSingle(seed, x, 1337);
+        int i0 = fastFloor(x);
+        int i1 = i0 + 1;
+        float x0 = x - i0;
+        float x1 = x0 - 1.0F;
+
+        float t0 = 1.0F - x0 * x0;
+        t0 *= t0;
+
+        float n0 = t0 * t0 * gradient1(seed, i0, x0);
+
+        float t1 = 1.0F - x1 * x1;
+        t1 *= t1;
+
+        float n1 = t1 * t1 * gradient1(seed, i1, x1);
+
+        return 3.1877655F * (n0 + n1);
     }
 
     @Override

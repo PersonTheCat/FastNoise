@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode.Exclude;
 import lombok.experimental.Accessors;
 import personthecat.fastnoise.function.NoiseProvider;
+import personthecat.fastnoise.function.NoiseScalar;
 import personthecat.fastnoise.generator.*;
 import personthecat.fastnoise.FastNoise;
 
@@ -22,6 +23,7 @@ public class NoiseDescriptor {
     private CellularReturnType cellularReturn = CellularReturnType.CELL_VALUE;
     private NoiseDescriptor[] noiseLookup = {};
     private MultiType multi = MultiType.SUM;
+    private NoiseScalar scalar = null;
     private int seed = 1337;
     private float frequencyX = 0.01F;
     private float frequencyY = 0.01F;
@@ -121,7 +123,8 @@ public class NoiseDescriptor {
     private FastNoise createGenerator() {
         FastNoise generator = this.getBasicGenerator();
         generator = FractalNoise.create(this, generator);
-        return DomainWarpedNoise.create(this, generator);
+        generator = DomainWarpedNoise.create(this, generator);
+        return ScaledNoise.create(this, generator);
     }
 
     private FastNoise getBasicGenerator() {

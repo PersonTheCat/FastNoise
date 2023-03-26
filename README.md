@@ -12,6 +12,15 @@ It is my hope that this library will facilitate generation of custom, highly-opt
 As of this time, it is merely a work-in-progress skeleton used exclusively for performance testing. 
 Please create an issue here if you are able to contribute to the project and help us achieve this goal.
 
+# Installation
+
+This fork of FastNoise is available on Maven Central! To use it in your project, add the following
+dependency in your build.gradle or pom.xml:
+
+```groovy
+implementation group: 'com.personthecat', name: 'fastnoise', version: '0.9'
+```
+
 # Using This Library
 
 To create a new generator, start by constructing a `NoiseDescriptor`.  Noise Descriptor is a data

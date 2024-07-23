@@ -151,6 +151,7 @@ public class NoiseDescriptor {
             case DISTANCE2_SUB: return new Cellular2EdgeNoise.Sub(this);
             case DISTANCE2_MUL: return new Cellular2EdgeNoise.Mul(this);
             case DISTANCE2_DIV: return new Cellular2EdgeNoise.Div(this);
+            case DISTANCE3: return new Cellular3EdgeNoise.Distance(this);
             case DISTANCE3_ADD: return new Cellular3EdgeNoise.Add(this);
             case DISTANCE3_SUB: return new Cellular3EdgeNoise.Sub(this);
             case DISTANCE3_MUL: return new Cellular3EdgeNoise.Mul(this);

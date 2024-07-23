@@ -44,10 +44,7 @@ public class DummyNoiseWrapper {
         }
 
         private WrappedGenerator(final DummyNoiseWrapper wrapper, final int seed) {
-            super(seed);
-            this.wrapNoise1 = wrapper.wrapNoise1;
-            this.wrapNoise2 = wrapper.wrapNoise2;
-            this.wrapNoise3 = wrapper.wrapNoise3;
+            this(wrapper, FastNoise.createDescriptor().seed(seed));
         }
 
         @Override
@@ -63,6 +60,19 @@ public class DummyNoiseWrapper {
         @Override
         public float getSingle(int seed, float x, float y, float z) {
             return this.wrapNoise3.getNoise(seed, x, y, z);
+        }
+
+        public DummyNoiseWrapper toWrapper() {
+            return FastNoise.createWrapper()
+                .wrapNoise1(this.wrapNoise1)
+                .wrapNoise2(this.wrapNoise2)
+                .wrapNoise3(this.wrapNoise3);
+        }
+
+        @Override
+        public NoiseDescriptor toDescriptor() {
+            final DummyNoiseWrapper wrapper = this.toWrapper();
+            return super.toDescriptor().provider(cfg -> new WrappedGenerator(wrapper, cfg));
         }
     }
 
@@ -85,6 +95,11 @@ public class DummyNoiseWrapper {
         @Override
         public float getNoise(float x, float y, float z) {
             return this.wrapNoise3.getNoise(this.seed, x, y, z);
+        }
+
+        @Override
+        public NoiseDescriptor toDescriptor() {
+            return super.toWrapper().createDescriptor();
         }
     }
 }

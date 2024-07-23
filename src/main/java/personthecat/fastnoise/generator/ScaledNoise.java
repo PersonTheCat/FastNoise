@@ -22,6 +22,12 @@ public class ScaledNoise extends FastNoise {
         return reference;
     }
 
+    @Override // this will get broken by NoiseType.SCALED due to loss of noiseLookup
+    public NoiseDescriptor toDescriptor() {
+        final NoiseDescriptor reference = this.reference.toDescriptor();
+        return super.toDescriptor().noise(reference.noise()).scalar(this.scalar);
+    }
+
     @Override
     public float getSingle(int seed, float x) {
         return this.scalar.scale(this.reference.getSingle(seed, x));

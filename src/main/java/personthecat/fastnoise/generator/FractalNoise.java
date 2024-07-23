@@ -1,6 +1,7 @@
 package personthecat.fastnoise.generator;
 
 import personthecat.fastnoise.FastNoise;
+import personthecat.fastnoise.data.FractalType;
 import personthecat.fastnoise.data.NoiseDescriptor;
 import personthecat.fastnoise.function.NoiseProvider;
 
@@ -28,14 +29,7 @@ public abstract class FractalNoise extends FastNoise {
     }
 
     public FractalNoise(final int seed, final FastNoise reference) {
-        super(seed);
-        this.lacunarityX = 2.0F;
-        this.lacunarityY = 2.0F;
-        this.lacunarityZ = 2.0F;
-        this.gain = 0.5F;
-        this.octaves = 3;
-        this.fractalBounding = getFractalBounding(this.gain, this.octaves);
-        this.reference = reference;
+        this(FastNoise.createDescriptor().seed(seed), reference);
     }
 
     public static FastNoise create(final NoiseDescriptor cfg, final NoiseProvider provider) {
@@ -53,6 +47,18 @@ public abstract class FractalNoise extends FastNoise {
     }
 
     protected abstract float fractal(final float f);
+
+    @Override // this will get broken by NoiseType.FRACTAL due to loss of noiseLookup
+    public NoiseDescriptor toDescriptor() {
+        final NoiseDescriptor reference = this.reference.toDescriptor();
+        return super.toDescriptor()
+            .noise(reference.noise())
+            .lacunarityX(this.lacunarityX)
+            .lacunarityY(this.lacunarityY)
+            .lacunarityZ(this.lacunarityZ)
+            .gain(this.gain)
+            .octaves(this.octaves);
+    }
 
     @Override
     public float getSingle(int seed, float x) {
@@ -117,6 +123,11 @@ public abstract class FractalNoise extends FastNoise {
         protected float fractal(float f) {
             return f;
         }
+
+        @Override
+        public NoiseDescriptor toDescriptor() {
+            return super.toDescriptor().fractal(FractalType.FBM);
+        }
     }
 
     public static class Billow extends FractalNoise {
@@ -137,6 +148,11 @@ public abstract class FractalNoise extends FastNoise {
         protected float fractal(float f) {
             return Math.abs(f) * 2 - 1;
         }
+
+        @Override
+        public NoiseDescriptor toDescriptor() {
+            return super.toDescriptor().fractal(FractalType.BILLOW);
+        }
     }
 
     public static class Rigid extends FractalNoise {
@@ -156,6 +172,11 @@ public abstract class FractalNoise extends FastNoise {
         @Override
         protected float fractal(float f) {
             return 1 - Math.abs(f);
+        }
+
+        @Override
+        public NoiseDescriptor toDescriptor() {
+            return super.toDescriptor().fractal(FractalType.RIGID_MULTI);
         }
     }
 
@@ -186,6 +207,11 @@ public abstract class FractalNoise extends FastNoise {
         private static float pingPong(float t) {
             t -= (int) (t * 0.5f) * 2;
             return t < 1 ? t : 2 - t;
+        }
+
+        @Override
+        public NoiseDescriptor toDescriptor() {
+            return super.toDescriptor().fractal(FractalType.PING_PONG).pingPongStrength(this.strength);
         }
     }
 }

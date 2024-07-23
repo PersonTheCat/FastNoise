@@ -2,9 +2,11 @@ package personthecat.fastnoise.generator;
 
 import personthecat.fastnoise.FastNoise;
 import personthecat.fastnoise.data.CellularDistanceType;
+import personthecat.fastnoise.data.CellularReturnType;
 import personthecat.fastnoise.data.Float2;
 import personthecat.fastnoise.data.Float3;
 import personthecat.fastnoise.data.NoiseDescriptor;
+import personthecat.fastnoise.data.NoiseType;
 
 import static personthecat.fastnoise.util.NoiseTables.CELL_2D;
 import static personthecat.fastnoise.util.NoiseTables.CELL_3D;
@@ -28,11 +30,7 @@ public abstract class Cellular2EdgeNoise extends FastNoise {
     }
 
     public Cellular2EdgeNoise(final int seed) {
-        super(seed);
-        this.distance = CellularDistanceType.EUCLIDEAN;
-        this.jitterX = 1.0F;
-        this.jitterY = 1.0F;
-        this.jitterZ = 1.0F;
+        this(FastNoise.createDescriptor().seed(seed));
     }
 
     public static Cellular2EdgeNoise create(final NoiseDescriptor cfg) {
@@ -46,6 +44,16 @@ public abstract class Cellular2EdgeNoise extends FastNoise {
     }
 
     public abstract float getReturn(final float distance, final float distance2);
+
+    @Override
+    public NoiseDescriptor toDescriptor() {
+        return super.toDescriptor()
+            .noise(NoiseType.CELLULAR)
+            .distance(this.distance)
+            .jitterX(this.jitterX)
+            .jitterY(this.jitterY)
+            .jitterZ(this.jitterZ);
+    }
 
     @Override
     public float getSingle(int seed, float x) {
@@ -186,6 +194,11 @@ public abstract class Cellular2EdgeNoise extends FastNoise {
         public float getReturn(final float distance, final float distance2) {
             return distance2 - 1;
         }
+
+        @Override
+        public NoiseDescriptor toDescriptor() {
+            return super.toDescriptor().cellularReturn(CellularReturnType.DISTANCE2);
+        }
     }
 
     public static class Add extends Cellular2EdgeNoise {
@@ -202,6 +215,11 @@ public abstract class Cellular2EdgeNoise extends FastNoise {
         public float getReturn(final float distance, final float distance2) {
             return distance2 + distance - 1;
         }
+
+        @Override
+        public NoiseDescriptor toDescriptor() {
+            return super.toDescriptor().cellularReturn(CellularReturnType.DISTANCE2_ADD);
+        }
     }
 
     public static class Sub extends Cellular2EdgeNoise {
@@ -213,6 +231,11 @@ public abstract class Cellular2EdgeNoise extends FastNoise {
         @Override
         public float getReturn(final float distance, final float distance2) {
             return distance2 - distance - 1;
+        }
+
+        @Override
+        public NoiseDescriptor toDescriptor() {
+            return super.toDescriptor().cellularReturn(CellularReturnType.DISTANCE2_SUB);
         }
     }
 
@@ -230,6 +253,11 @@ public abstract class Cellular2EdgeNoise extends FastNoise {
         public float getReturn(final float distance, final float distance2) {
             return distance2 * distance - 1;
         }
+
+        @Override
+        public NoiseDescriptor toDescriptor() {
+            return super.toDescriptor().cellularReturn(CellularReturnType.DISTANCE2_MUL);
+        }
     }
 
     public static class Div extends Cellular2EdgeNoise {
@@ -245,6 +273,11 @@ public abstract class Cellular2EdgeNoise extends FastNoise {
         @Override
         public float getReturn(final float distance, final float distance2) {
             return distance / distance2 - 1;
+        }
+
+        @Override
+        public NoiseDescriptor toDescriptor() {
+            return super.toDescriptor().cellularReturn(CellularReturnType.DISTANCE2_DIV);
         }
     }
 }

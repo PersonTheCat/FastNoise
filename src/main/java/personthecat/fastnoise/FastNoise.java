@@ -35,18 +35,7 @@ public abstract class FastNoise {
     }
 
     public FastNoise(final int seed) {
-        this.seed = seed;
-        this.frequencyX = 0.1F;
-        this.frequencyY = 0.1F;
-        this.frequencyZ = 0.1F;
-        this.offsetX = 0.0F;
-        this.offsetY = 0.0F;
-        this.offsetZ = 0.0F;
-        this.scaleAmplitude = 1.0F;
-        this.scaleOffset = 0.0F;
-        this.minThreshold = 0.0F;
-        this.maxThreshold = 1.0F;
-        this.invert = false;
+        this(createDescriptor().seed(seed));
     }
 
     public static NoiseDescriptor createDescriptor() {
@@ -55,6 +44,22 @@ public abstract class FastNoise {
 
     public static DummyNoiseWrapper createWrapper() {
         return new DummyNoiseWrapper();
+    }
+
+    public NoiseDescriptor toDescriptor() {
+        return new NoiseDescriptor()
+            .seed(this.seed)
+            .frequencyX(this.frequencyX)
+            .frequencyY(this.frequencyY)
+            .frequencyZ(this.frequencyZ)
+            .offsetX(this.offsetX)
+            .offsetY(this.offsetY)
+            .offsetZ(this.offsetZ)
+            .scaleAmplitude(this.scaleAmplitude)
+            .scaleOffset(this.scaleOffset)
+            .minThreshold(this.minThreshold)
+            .maxThreshold(this.maxThreshold)
+            .invert(this.invert);
     }
 
     public abstract float getSingle(final int seed, final float x);

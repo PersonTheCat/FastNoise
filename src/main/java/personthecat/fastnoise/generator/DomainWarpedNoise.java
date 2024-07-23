@@ -1,9 +1,11 @@
 package personthecat.fastnoise.generator;
 
 import personthecat.fastnoise.FastNoise;
+import personthecat.fastnoise.data.DomainWarpType;
 import personthecat.fastnoise.data.Float2;
 import personthecat.fastnoise.data.Float3;
 import personthecat.fastnoise.data.NoiseDescriptor;
+import personthecat.fastnoise.data.NoiseType;
 import personthecat.fastnoise.function.NoiseProvider;
 
 import static personthecat.fastnoise.util.NoiseTables.CELL_2D;
@@ -47,14 +49,7 @@ public abstract class DomainWarpedNoise extends FastNoise {
     }
 
     public DomainWarpedNoise(final int seed, final FastNoise reference) {
-        super(seed);
-        this.reference = reference;
-        this.warpAmplitudeX = 1.0F;
-        this.warpAmplitudeY = 1.0F;
-        this.warpAmplitudeZ = 1.0F;
-        this.warpFrequencyX = 0.1F;
-        this.warpFrequencyY = 0.1F;
-        this.warpFrequencyZ = 0.1F;
+        this(FastNoise.createDescriptor().seed(seed), reference);
     }
 
     public static FastNoise create(final NoiseDescriptor cfg, final NoiseProvider provider) {
@@ -68,6 +63,19 @@ public abstract class DomainWarpedNoise extends FastNoise {
             case SIMPLEX2_REDUCED: return new Simplex2Reduced(cfg, reference);
             default: return reference;
         }
+    }
+
+    @Override // this will get broken by NoiseType.FRACTAL due to loss of noiseLookup
+    public NoiseDescriptor toDescriptor() {
+        final NoiseDescriptor reference = this.reference.toDescriptor();
+        return super.toDescriptor()
+            .noise(reference.noise())
+            .warpAmplitudeX(this.warpAmplitudeX)
+            .warpAmplitudeY(this.warpAmplitudeY)
+            .warpAmplitudeZ(this.warpAmplitudeZ)
+            .warpFrequencyX(this.warpFrequencyX)
+            .warpFrequencyY(this.warpFrequencyY)
+            .warpFrequencyZ(this.warpFrequencyZ);
     }
 
     @Override
@@ -198,6 +206,11 @@ public abstract class DomainWarpedNoise extends FastNoise {
             z *= this.frequencyZ;
 
             return this.reference.getSingle(this.seed, x, y, z);
+        }
+
+        @Override
+        public NoiseDescriptor toDescriptor() {
+            return super.toDescriptor().warp(DomainWarpType.BASIC_GRID);
         }
     }
 
@@ -449,6 +462,11 @@ public abstract class DomainWarpedNoise extends FastNoise {
             z *= this.frequencyZ;
             return this.reference.getSingle(this.seed, x, y, z);
         }
+
+        @Override
+        public NoiseDescriptor toDescriptor() {
+            return super.toDescriptor().warp(DomainWarpType.SIMPLEX2);
+        }
     }
 
     public static class Simplex2Reduced extends DomainWarpedNoise {
@@ -640,6 +658,11 @@ public abstract class DomainWarpedNoise extends FastNoise {
             y *= this.frequencyY;
             z *= this.frequencyZ;
             return this.reference.getSingle(this.seed, x, y, z);
+        }
+
+        @Override
+        public NoiseDescriptor toDescriptor() {
+            return super.toDescriptor().warp(DomainWarpType.SIMPLEX2_REDUCED);
         }
     }
 }

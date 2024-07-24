@@ -2,8 +2,8 @@ package personthecat.fastnoise;
 
 import personthecat.fastnoise.data.FractalType;
 import personthecat.fastnoise.data.NoiseType;
-import personthecat.fastnoise.data.CellularDistanceType;
-import personthecat.fastnoise.data.CellularReturnType;
+import personthecat.fastnoise.data.DistanceType;
+import personthecat.fastnoise.data.ReturnType;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -64,11 +64,11 @@ public class PerformanceTest {
         }
 
         FastNoise createNewGenerator() {
-            return FastNoise.createDescriptor()
-                .noise(NoiseType.SIMPLEX2)
+            return FastNoise.builder()
+                .type(NoiseType.SIMPLEX2)
                 .fractal(FractalType.NONE)
-                .distance(this.randomEnum(CellularDistanceType.class))
-                .cellularReturn(this.randomEnum(CellularReturnType.class))
+                .distance(this.randomEnum(DistanceType.class))
+                .cellularReturn(this.randomEnum(ReturnType.class))
                 .seed(RAND.nextInt())
                 .frequency(RAND.nextFloat())
                 .octaves(RAND.nextInt(MAX_OCTAVES) + 1)
@@ -79,7 +79,7 @@ public class PerformanceTest {
                 .invert(RAND.nextBoolean())
                 .range(-RAND.nextFloat(), RAND.nextFloat())
                 .threshold(-RAND.nextFloat(), RAND.nextFloat())
-                .generate();
+                .build();
         }
 
         OriginalFastNoise createOldGenerator() {

@@ -5,18 +5,28 @@ import personthecat.fastnoise.util.EnumNamingService;
 
 import java.util.regex.Pattern;
 
-public enum DomainWarpType {
-    SIMPLEX2,
-    SIMPLEX2_REDUCED,
-    BASIC_GRID,
-    NONE;
+public enum ReturnType {
+    CELL_VALUE,
+    NOISE_LOOKUP,
+    DISTANCE,
+    DISTANCE2,
+    DISTANCE2_ADD,
+    DISTANCE2_SUB,
+    DISTANCE2_MUL,
+    DISTANCE2_DIV,
+    DISTANCE3,
+    DISTANCE3_ADD,
+    DISTANCE3_SUB,
+    DISTANCE3_MUL,
+    DISTANCE3_DIV,
+    FUNCTION;
 
     final Pattern pattern = EnumNamingService.createPattern(this);
     final String formatted = EnumNamingService.formatName(this);
 
     @Nullable
-    public static DomainWarpType from(final String s) {
-        for (final DomainWarpType t : values()) {
+    public static ReturnType from(final String s) {
+        for (final ReturnType t : values()) {
             if (t.pattern.matcher(s).matches()) {
                 return t;
             }

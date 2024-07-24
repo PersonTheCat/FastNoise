@@ -1,10 +1,11 @@
 package personthecat.fastnoise.generator;
 
 import personthecat.fastnoise.FastNoise;
-import personthecat.fastnoise.data.NoiseDescriptor;
+import personthecat.fastnoise.data.NoiseBuilder;
 import personthecat.fastnoise.data.NoiseType;
 
 import static personthecat.fastnoise.util.NoiseUtils.fastFloor;
+import static personthecat.fastnoise.util.NoiseUtils.interpolateHermite;
 import static personthecat.fastnoise.util.NoiseUtils.lerp;
 import static personthecat.fastnoise.util.NoiseUtils.value1;
 import static personthecat.fastnoise.util.NoiseUtils.value2;
@@ -12,7 +13,7 @@ import static personthecat.fastnoise.util.NoiseUtils.value3;
 
 public class ValueNoise extends FastNoise {
 
-    public ValueNoise(final NoiseDescriptor cfg) {
+    public ValueNoise(final NoiseBuilder cfg) {
         super(cfg);
     }
 
@@ -21,8 +22,8 @@ public class ValueNoise extends FastNoise {
     }
 
     @Override
-    public NoiseDescriptor toDescriptor() {
-        return super.toDescriptor().noise(NoiseType.VALUE);
+    public NoiseBuilder toBuilder() {
+        return super.toBuilder().type(NoiseType.VALUE);
     }
 
     @Override
@@ -30,7 +31,7 @@ public class ValueNoise extends FastNoise {
         int x0 = fastFloor(x);
         int x1 = x0 + 1;
 
-        final float xs = this.interpolate(x - x0);
+        final float xs = interpolateHermite(x - x0);
 
         return lerp(value1(seed, x0), value1(seed, x1), xs);
     }
@@ -42,8 +43,8 @@ public class ValueNoise extends FastNoise {
         int x1 = x0 + 1;
         int y1 = y0 + 1;
 
-        final float xs = this.interpolate(x - x0);
-        final float ys = this.interpolate(y - y0);
+        final float xs = interpolateHermite(x - x0);
+        final float ys = interpolateHermite(y - y0);
 
         float xf0 = lerp(value2(seed, x0, y0), value2(seed, x1, y0), xs);
         float xf1 = lerp(value2(seed, x0, y1), value2(seed, x1, y1), xs);
@@ -60,9 +61,9 @@ public class ValueNoise extends FastNoise {
         int y1 = y0 + 1;
         int z1 = z0 + 1;
 
-        final float xs = this.interpolate(x - x0);
-        final float ys = this.interpolate(y - y0);
-        final float zs = this.interpolate(z - z0);
+        final float xs = interpolateHermite(x - x0);
+        final float ys = interpolateHermite(y - y0);
+        final float zs = interpolateHermite(z - z0);
 
         float xf00 = lerp(value3(seed, x0, y0, z0), value3(seed, x1, y0, z0), xs);
         float xf10 = lerp(value3(seed, x0, y1, z0), value3(seed, x1, y1, z0), xs);

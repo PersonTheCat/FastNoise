@@ -2,7 +2,8 @@ package personthecat.fastnoise.generator;
 
 import personthecat.fastnoise.FastNoise;
 import personthecat.fastnoise.data.FractalType;
-import personthecat.fastnoise.data.NoiseDescriptor;
+import personthecat.fastnoise.data.NoiseBuilder;
+import personthecat.fastnoise.data.NoiseType;
 import personthecat.fastnoise.function.FractalFunction;
 
 import static personthecat.fastnoise.util.NoiseUtils.getFractalBounding;
@@ -20,7 +21,7 @@ public class FractalNoise extends FastNoise {
     protected final FastNoise reference;
     protected final float pingPongStrength;
 
-    public FractalNoise(final NoiseDescriptor cfg, final FastNoise reference) {
+    public FractalNoise(final NoiseBuilder cfg, final FastNoise reference) {
         super(cfg);
         this.fractalType = cfg.fractal();
         this.fractalFunction = cfg.fractalFunction();
@@ -35,14 +36,14 @@ public class FractalNoise extends FastNoise {
     }
 
     public FractalNoise(final int seed, final FastNoise reference) {
-        this(FastNoise.createDescriptor().seed(seed), reference);
+        this(FastNoise.builder().seed(seed), reference);
     }
 
-    @Override // this will get broken by NoiseType.FRACTAL due to loss of noiseLookup
-    public NoiseDescriptor toDescriptor() {
-        final NoiseDescriptor reference = this.reference.toDescriptor();
-        return super.toDescriptor()
-            .noise(reference.noise())
+    @Override
+    public NoiseBuilder toBuilder() {
+        return super.toBuilder()
+            .type(NoiseType.FRACTAL)
+            .reference(this.reference.toBuilder())
             .fractal(this.fractalType)
             .fractalFunction(this.fractalFunction)
             .lacunarityX(this.lacunarityX)

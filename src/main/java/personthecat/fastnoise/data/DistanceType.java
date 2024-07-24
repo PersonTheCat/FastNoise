@@ -5,7 +5,7 @@ import personthecat.fastnoise.util.EnumNamingService;
 
 import java.util.regex.Pattern;
 
-public enum CellularDistanceType {
+public enum DistanceType {
     EUCLIDEAN,
     MANHATTAN,
     NATURAL,
@@ -15,8 +15,8 @@ public enum CellularDistanceType {
     final String formatted = EnumNamingService.formatName(this);
 
     @Nullable
-    public static CellularDistanceType from(final String s) {
-        for (final CellularDistanceType t : values()) {
+    public static DistanceType from(final String s) {
+        for (final DistanceType t : values()) {
             if (t.pattern.matcher(s).matches()) {
                 return t;
             }

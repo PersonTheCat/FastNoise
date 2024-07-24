@@ -2,24 +2,24 @@ package personthecat.fastnoise.generator;
 
 import personthecat.fastnoise.FastNoise;
 import personthecat.fastnoise.data.MultiType;
-import personthecat.fastnoise.data.NoiseDescriptor;
+import personthecat.fastnoise.data.NoiseBuilder;
 import personthecat.fastnoise.function.MultiFunction;
 
 import java.util.stream.Stream;
 
-public abstract class MultiGenerator extends FastNoise {
+public abstract class MultiNoise extends FastNoise {
 
     protected final FastNoise[] references;
 
-    protected MultiGenerator(final NoiseDescriptor cfg) {
+    protected MultiNoise(final NoiseBuilder cfg) {
         super(cfg);
-        this.references = Stream.of(cfg.noiseLookup()).map(NoiseDescriptor::generate).toArray(FastNoise[]::new);
+        this.references = cfg.buildReferences();
     }
 
     @Override
-    public NoiseDescriptor toDescriptor() {
-        return super.toDescriptor().noiseLookup(
-            Stream.of(this.references).map(FastNoise::toDescriptor).toArray(NoiseDescriptor[]::new));
+    public NoiseBuilder toBuilder() {
+        return super.toBuilder().references(
+            Stream.of(this.references).map(FastNoise::toBuilder).toArray(NoiseBuilder[]::new));
     }
 
     @Override
@@ -37,9 +37,9 @@ public abstract class MultiGenerator extends FastNoise {
         return 0F;
     }
 
-    public static class Min extends MultiGenerator {
+    public static class Min extends MultiNoise {
 
-        public Min(final NoiseDescriptor cfg) {
+        public Min(final NoiseBuilder cfg) {
             super(cfg);
         }
 
@@ -71,14 +71,14 @@ public abstract class MultiGenerator extends FastNoise {
         }
 
         @Override
-        public NoiseDescriptor toDescriptor() {
-            return super.toDescriptor().multi(MultiType.MIN);
+        public NoiseBuilder toBuilder() {
+            return super.toBuilder().multi(MultiType.MIN);
         }
     }
 
-    public static class Max extends MultiGenerator {
+    public static class Max extends MultiNoise {
 
-        public Max(final NoiseDescriptor cfg) {
+        public Max(final NoiseBuilder cfg) {
             super(cfg);
         }
 
@@ -110,14 +110,14 @@ public abstract class MultiGenerator extends FastNoise {
         }
 
         @Override
-        public NoiseDescriptor toDescriptor() {
-            return super.toDescriptor().multi(MultiType.MAX);
+        public NoiseBuilder toBuilder() {
+            return super.toBuilder().multi(MultiType.MAX);
         }
     }
 
-    public static class Avg extends MultiGenerator {
+    public static class Avg extends MultiNoise {
 
-        public Avg(final NoiseDescriptor cfg) {
+        public Avg(final NoiseBuilder cfg) {
             super(cfg);
         }
 
@@ -149,14 +149,14 @@ public abstract class MultiGenerator extends FastNoise {
         }
 
         @Override
-        public NoiseDescriptor toDescriptor() {
-            return super.toDescriptor().multi(MultiType.AVG);
+        public NoiseBuilder toBuilder() {
+            return super.toBuilder().multi(MultiType.AVG);
         }
     }
 
-    public static class Mul extends MultiGenerator {
+    public static class Mul extends MultiNoise {
 
-        public Mul(final NoiseDescriptor cfg) {
+        public Mul(final NoiseBuilder cfg) {
             super(cfg);
         }
 
@@ -215,14 +215,14 @@ public abstract class MultiGenerator extends FastNoise {
         }
 
         @Override
-        public NoiseDescriptor toDescriptor() {
-            return super.toDescriptor().multi(MultiType.MUL);
+        public NoiseBuilder toBuilder() {
+            return super.toBuilder().multi(MultiType.MUL);
         }
     }
 
-    public static class Div extends MultiGenerator {
+    public static class Div extends MultiNoise {
 
-        public Div(final NoiseDescriptor cfg) {
+        public Div(final NoiseBuilder cfg) {
             super(cfg);
         }
 
@@ -299,14 +299,14 @@ public abstract class MultiGenerator extends FastNoise {
         }
 
         @Override
-        public NoiseDescriptor toDescriptor() {
-            return super.toDescriptor().multi(MultiType.DIV);
+        public NoiseBuilder toBuilder() {
+            return super.toBuilder().multi(MultiType.DIV);
         }
     }
 
-    public static class Sum extends MultiGenerator {
+    public static class Sum extends MultiNoise {
 
-        public Sum(final NoiseDescriptor cfg) {
+        public Sum(final NoiseBuilder cfg) {
             super(cfg);
         }
 
@@ -365,16 +365,16 @@ public abstract class MultiGenerator extends FastNoise {
         }
 
         @Override
-        public NoiseDescriptor toDescriptor() {
-            return super.toDescriptor().multi(MultiType.SUM);
+        public NoiseBuilder toBuilder() {
+            return super.toBuilder().multi(MultiType.SUM);
         }
     }
 
-    public static class Function extends MultiGenerator {
+    public static class Function extends MultiNoise {
 
         private final MultiFunction multiFunction;
 
-        public Function(final NoiseDescriptor cfg) {
+        public Function(final NoiseBuilder cfg) {
             super(cfg);
             this.multiFunction = cfg.multiFunction();
         }
@@ -395,8 +395,8 @@ public abstract class MultiGenerator extends FastNoise {
         }
 
         @Override
-        public NoiseDescriptor toDescriptor() {
-            return super.toDescriptor().multiFunction(this.multiFunction);
+        public NoiseBuilder toBuilder() {
+            return super.toBuilder().multiFunction(this.multiFunction);
         }
     }
 }

@@ -1,11 +1,11 @@
 package personthecat.fastnoise;
 
-import personthecat.fastnoise.data.NoiseDescriptor;
-import personthecat.fastnoise.generator.DummyNoiseWrapper;
+import personthecat.fastnoise.data.NoiseBuilder;
+import personthecat.fastnoise.generator.NoiseWrapper;
 
 @SuppressWarnings("unused")
 public abstract class FastNoise {
-    private static final FastNoise DUMMY = createWrapper().generatePassthrough();
+    protected static final FastNoise DUMMY = wrapper().generatePassthrough();
 
     protected final int seed;
     protected final float frequencyX;
@@ -20,7 +20,7 @@ public abstract class FastNoise {
     protected final float maxThreshold;
     protected final boolean invert;
 
-    public FastNoise(final NoiseDescriptor cfg) {
+    public FastNoise(final NoiseBuilder cfg) {
         this.seed = cfg.seed();
         this.frequencyX = cfg.frequencyX();
         this.frequencyY = cfg.frequencyY();
@@ -36,23 +36,27 @@ public abstract class FastNoise {
     }
 
     public FastNoise(final int seed) {
-        this(createDescriptor().seed(seed));
+        this(builder().seed(seed));
     }
 
-    public static NoiseDescriptor createDescriptor() {
-        return new NoiseDescriptor();
+    public static NoiseBuilder builder() {
+        return new NoiseBuilder();
     }
 
-    public static DummyNoiseWrapper createWrapper() {
-        return new DummyNoiseWrapper();
+    public static NoiseWrapper wrapper() {
+        return new NoiseWrapper();
     }
 
     public static FastNoise dummy() {
         return DUMMY;
     }
 
-    public NoiseDescriptor toDescriptor() {
-        return new NoiseDescriptor()
+    protected static <T> T get(final T t, final T def) {
+        return t != null ? t : def;
+    }
+
+    public NoiseBuilder toBuilder() {
+        return new NoiseBuilder()
             .seed(this.seed)
             .frequencyX(this.frequencyX)
             .frequencyY(this.frequencyY)
@@ -128,9 +132,5 @@ public abstract class FastNoise {
 
     public boolean isInThreshold(final float noise, final float d) {
         return this.invert != (noise > this.minThreshold - d && noise < this.maxThreshold + d);
-    }
-
-    protected float interpolate(final float t) {
-        return t * t * (3 - 2 * t);
     }
 }

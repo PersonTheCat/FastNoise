@@ -25,9 +25,9 @@ public class NoiseViewer {
     }
 
     private static class Context {
-        final List<NoiseDescriptor> lookups = new ArrayList<>();
+        final List<NoiseBuilder> references = new ArrayList<>();
         final Scanner scanner;
-        NoiseDescriptor descriptor;
+        NoiseBuilder builder;
         FastNoise generator;
         final Random rand;
         DrawMode mode;
@@ -41,8 +41,8 @@ public class NoiseViewer {
 
         Context(final Scanner s) {
             this.scanner = s;
-            this.descriptor = new NoiseDescriptor();
-            this.generator = descriptor.generate();
+            this.builder = new NoiseBuilder();
+            this.generator = builder.build();
             this.rand = new Random();
             this.mode = DrawMode.STANDARD;
             this.scale = DEFAULT_SCALE;
@@ -72,9 +72,11 @@ public class NoiseViewer {
             System.out.println("k: Move down");
             System.out.println("t: Toggle threshold / standard / line mode");
             System.out.println("d: Toggle 3D / 2D");
-            System.out.println("s: Store as lookup");
-            System.out.println("a: Apply lookups from storage");
+            System.out.println("l: Convert settings to noiseLookup");
+            System.out.println("s: Store as reference");
+            System.out.println("a: Apply references from storage");
             System.out.println("p: Print settings");
+            System.out.println("r: Reset settings");
             System.out.println("scale <num>: Update 1D scale (for line mode)");
             System.out.println("<key> <value>: Set property");
             System.out.println("q: Exit");
@@ -86,9 +88,11 @@ public class NoiseViewer {
                 case "k": this.down(); break;
                 case "t": this.toggle(); break;
                 case "d": this.dimensions(); break;
-                case "s": this.storeLookup(); break;
-                case "a": this.applyLookups(); break;
+                case "l": this.convertToLookup(); break;
+                case "s": this.storeReferences(); break;
+                case "a": this.applyReferences(); break;
                 case "p": this.print(); break;
+                case "r": this.reset(); break;
                 case "q": System.exit(0);
                 default: this.set(command);
             }
@@ -132,202 +136,202 @@ public class NoiseViewer {
                     if (length == 1) { System.out.println(this.scale); return; }
                     this.scale = Integer.parseInt(value);
                     break;
-                case "noise":
-                    if (length == 1) { System.out.println(this.descriptor.noise()); return; }
-                    final NoiseType noise = NoiseType.from(value);
-                    if (noise == null) throw new IllegalArgumentException();
-                    this.descriptor.noise(noise);
+                case "type":
+                    if (length == 1) { System.out.println(this.builder.type()); return; }
+                    final NoiseType type = NoiseType.from(value);
+                    if (type == null) throw new IllegalArgumentException();
+                    this.builder.type(type);
                     break;
                 case "fractal":
-                    if (length == 1) { System.out.println(this.descriptor.fractal()); return; }
+                    if (length == 1) { System.out.println(this.builder.fractal()); return; }
                     final FractalType fractal = FractalType.from(value);
                     if (fractal == null) throw new IllegalArgumentException();
-                    this.descriptor.fractal(fractal);
+                    this.builder.fractal(fractal);
                     break;
                 case "warp":
-                    if (length == 1) { System.out.println(this.descriptor.warp()); return; }
-                    final DomainWarpType domainWarp = DomainWarpType.from(value);
+                    if (length == 1) { System.out.println(this.builder.warp()); return; }
+                    final WarpType domainWarp = WarpType.from(value);
                     if (domainWarp == null) throw new IllegalArgumentException();
-                    this.descriptor.warp(domainWarp);
+                    this.builder.warp(domainWarp);
                     break;
                 case "distance":
-                    if (length == 1) { System.out.println(this.descriptor.distance()); return; }
-                    final CellularDistanceType distance = CellularDistanceType.from(value);
+                    if (length == 1) { System.out.println(this.builder.distance()); return; }
+                    final DistanceType distance = DistanceType.from(value);
                     if (distance == null) throw new IllegalArgumentException();
-                    this.descriptor.distance(distance);
+                    this.builder.distance(distance);
                     break;
                 case "cellularReturn":
-                    if (length == 1) { System.out.println(this.descriptor.cellularReturn()); return; }
-                    final CellularReturnType cellularReturn = CellularReturnType.from(value);
+                    if (length == 1) { System.out.println(this.builder.cellularReturn()); return; }
+                    final ReturnType cellularReturn = ReturnType.from(value);
                     if (cellularReturn == null) throw new IllegalArgumentException();
-                    this.descriptor.cellularReturn(cellularReturn);
+                    this.builder.cellularReturn(cellularReturn);
                     break;
                 case "multi":
-                    if (length == 1) { System.out.println(this.descriptor.multi()); return; }
+                    if (length == 1) { System.out.println(this.builder.multi()); return; }
                     final MultiType multi = MultiType.from(value);
                     if (multi == null) throw new IllegalArgumentException();
-                    this.descriptor.multi(multi);
+                    this.builder.multi(multi);
                     break;
                 case "seed":
-                    if (length == 1) { System.out.println(this.descriptor.seed()); return; }
-                    this.descriptor.seed(Integer.parseInt(value));
+                    if (length == 1) { System.out.println(this.builder.seed()); return; }
+                    this.builder.seed(Integer.parseInt(value));
                     break;
                 case "frequencyX":
-                    if (length == 1) { System.out.println(this.descriptor.frequencyX()); return; }
-                    this.descriptor.frequencyX(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.frequencyX()); return; }
+                    this.builder.frequencyX(Float.parseFloat(value));
                     break;
                 case "frequencyY":
-                    if (length == 1) { System.out.println(this.descriptor.frequencyY()); return; }
-                    this.descriptor.frequencyY(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.frequencyY()); return; }
+                    this.builder.frequencyY(Float.parseFloat(value));
                     break;
                 case "frequencyZ":
-                    if (length == 1) { System.out.println(this.descriptor.frequencyZ()); return; }
-                    this.descriptor.frequencyZ(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.frequencyZ()); return; }
+                    this.builder.frequencyZ(Float.parseFloat(value));
                     break;
                 case "frequency":
                     if (length == 1) {
-                        System.out.println("x: " + this.descriptor.frequencyX());
-                        System.out.println("y: " + this.descriptor.frequencyY());
-                        System.out.println("z: " + this.descriptor.frequencyZ());
+                        System.out.println("x: " + this.builder.frequencyX());
+                        System.out.println("y: " + this.builder.frequencyY());
+                        System.out.println("z: " + this.builder.frequencyZ());
                         return;
                     }
-                    this.descriptor.frequency(Float.parseFloat(value));
+                    this.builder.frequency(Float.parseFloat(value));
                     break;
                 case "octaves":
-                    if (length == 1) { System.out.println(this.descriptor.octaves()); return; }
-                    this.descriptor.octaves(Integer.parseInt(value));
+                    if (length == 1) { System.out.println(this.builder.octaves()); return; }
+                    this.builder.octaves(Integer.parseInt(value));
                     break;
                 case "lacunarityX":
-                    if (length == 1) { System.out.println(this.descriptor.lacunarityX()); return; }
-                    this.descriptor.lacunarityX(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.lacunarityX()); return; }
+                    this.builder.lacunarityX(Float.parseFloat(value));
                     break;
                 case "lacunarityY":
-                    if (length == 1) { System.out.println(this.descriptor.lacunarityY()); return; }
-                    this.descriptor.lacunarityY(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.lacunarityY()); return; }
+                    this.builder.lacunarityY(Float.parseFloat(value));
                     break;
                 case "lacunarityZ":
-                    if (length == 1) { System.out.println(this.descriptor.lacunarityZ()); return; }
-                    this.descriptor.lacunarityZ(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.lacunarityZ()); return; }
+                    this.builder.lacunarityZ(Float.parseFloat(value));
                     break;
                 case "lacunarity":
                     if (length == 1) {
-                        System.out.println("x: " + this.descriptor.lacunarityX());
-                        System.out.println("y: " + this.descriptor.lacunarityY());
-                        System.out.println("z: " + this.descriptor.lacunarityZ());
+                        System.out.println("x: " + this.builder.lacunarityX());
+                        System.out.println("y: " + this.builder.lacunarityY());
+                        System.out.println("z: " + this.builder.lacunarityZ());
                         return;
                     }
-                    this.descriptor.lacunarity(Float.parseFloat(value));
+                    this.builder.lacunarity(Float.parseFloat(value));
                     break;
                 case "gain":
-                    if (length == 1) { System.out.println(this.descriptor.gain()); return; }
-                    this.descriptor.gain(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.gain()); return; }
+                    this.builder.gain(Float.parseFloat(value));
                     break;
                 case "pingPongStrength":
-                    if (length == 1) { System.out.println(this.descriptor.pingPongStrength()); return; }
-                    this.descriptor.pingPongStrength(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.pingPongStrength()); return; }
+                    this.builder.pingPongStrength(Float.parseFloat(value));
                     break;
                 case "jitterX":
-                    if (length == 1) { System.out.println(this.descriptor.jitterX()); return; }
-                    this.descriptor.jitterX(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.jitterX()); return; }
+                    this.builder.jitterX(Float.parseFloat(value));
                     break;
                 case "jitterY":
-                    if (length == 1) { System.out.println(this.descriptor.jitterY()); return; }
-                    this.descriptor.jitterY(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.jitterY()); return; }
+                    this.builder.jitterY(Float.parseFloat(value));
                     break;
                 case "jitterZ":
-                    if (length == 1) { System.out.println(this.descriptor.jitterZ()); return; }
-                    this.descriptor.jitterZ(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.jitterZ()); return; }
+                    this.builder.jitterZ(Float.parseFloat(value));
                     break;
                 case "jitter":
                     if (length == 1) {
-                        System.out.println("x: " + this.descriptor.jitterX());
-                        System.out.println("y: " + this.descriptor.jitterY());
-                        System.out.println("z: " + this.descriptor.jitterZ());
+                        System.out.println("x: " + this.builder.jitterX());
+                        System.out.println("y: " + this.builder.jitterY());
+                        System.out.println("z: " + this.builder.jitterZ());
                         return;
                     }
-                    this.descriptor.jitter(Float.parseFloat(value));
+                    this.builder.jitter(Float.parseFloat(value));
                     break;
                 case "warpAmplitudeX":
-                    if (length == 1) { System.out.println(this.descriptor.warpAmplitudeX()); return; }
-                    this.descriptor.warpAmplitudeX(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.warpAmplitudeX()); return; }
+                    this.builder.warpAmplitudeX(Float.parseFloat(value));
                     break;
                 case "warpAmplitudeY":
-                    if (length == 1) { System.out.println(this.descriptor.warpAmplitudeY()); return; }
-                    this.descriptor.warpAmplitudeY(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.warpAmplitudeY()); return; }
+                    this.builder.warpAmplitudeY(Float.parseFloat(value));
                     break;
                 case "warpAmplitudeZ":
-                    if (length == 1) { System.out.println(this.descriptor.warpAmplitudeZ()); return; }
-                    this.descriptor.warpAmplitudeZ(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.warpAmplitudeZ()); return; }
+                    this.builder.warpAmplitudeZ(Float.parseFloat(value));
                     break;
                 case "warpAmplitude":
                     if (length == 1) {
-                        System.out.println("x: " + this.descriptor.warpAmplitudeX());
-                        System.out.println("y: " + this.descriptor.warpAmplitudeY());
-                        System.out.println("z: " + this.descriptor.warpAmplitudeZ());
+                        System.out.println("x: " + this.builder.warpAmplitudeX());
+                        System.out.println("y: " + this.builder.warpAmplitudeY());
+                        System.out.println("z: " + this.builder.warpAmplitudeZ());
                         return;
                     }
-                    this.descriptor.warpAmplitude(Float.parseFloat(value));
+                    this.builder.warpAmplitude(Float.parseFloat(value));
                     break;
                 case "warpFrequencyX":
-                    if (length == 1) { System.out.println(this.descriptor.warpFrequencyX()); return; }
-                    this.descriptor.warpFrequencyX(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.warpFrequencyX()); return; }
+                    this.builder.warpFrequencyX(Float.parseFloat(value));
                     break;
                 case "warpFrequencyY":
-                    if (length == 1) { System.out.println(this.descriptor.warpFrequencyY()); return; }
-                    this.descriptor.warpFrequencyY(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.warpFrequencyY()); return; }
+                    this.builder.warpFrequencyY(Float.parseFloat(value));
                     break;
                 case "warpFrequencyZ":
-                    if (length == 1) { System.out.println(this.descriptor.warpFrequencyZ()); return; }
-                    this.descriptor.warpFrequencyZ(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.warpFrequencyZ()); return; }
+                    this.builder.warpFrequencyZ(Float.parseFloat(value));
                     break;
                 case "warpFrequency":
                     if (length == 1) {
-                        System.out.println("x: " + this.descriptor.warpFrequencyX());
-                        System.out.println("y: " + this.descriptor.warpFrequencyY());
-                        System.out.println("z: " + this.descriptor.warpFrequencyZ());
+                        System.out.println("x: " + this.builder.warpFrequencyX());
+                        System.out.println("y: " + this.builder.warpFrequencyY());
+                        System.out.println("z: " + this.builder.warpFrequencyZ());
                         return;
                     }
-                    this.descriptor.warpFrequency(Float.parseFloat(value));
+                    this.builder.warpFrequency(Float.parseFloat(value));
                     break;
                 case "offsetX":
-                    if (length == 1) { System.out.println(this.descriptor.offsetX()); return; }
-                    this.descriptor.offsetX(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.offsetX()); return; }
+                    this.builder.offsetX(Float.parseFloat(value));
                     break;
                 case "offsetY":
-                    if (length == 1) { System.out.println(this.descriptor.offsetY()); return; }
-                    this.descriptor.offsetY(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.offsetY()); return; }
+                    this.builder.offsetY(Float.parseFloat(value));
                     break;
                 case "offsetZ":
-                    if (length == 1) { System.out.println(this.descriptor.offsetZ()); return; }
-                    this.descriptor.offsetZ(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.offsetZ()); return; }
+                    this.builder.offsetZ(Float.parseFloat(value));
                     break;
                 case "offset":
                     if (length == 1) {
-                        System.out.println("x: " + this.descriptor.offsetX());
-                        System.out.println("y: " + this.descriptor.offsetY());
-                        System.out.println("z: " + this.descriptor.offsetZ());
+                        System.out.println("x: " + this.builder.offsetX());
+                        System.out.println("y: " + this.builder.offsetY());
+                        System.out.println("z: " + this.builder.offsetZ());
                         return;
                     }
-                    this.descriptor.offset(Integer.parseInt(value));
+                    this.builder.offset(Integer.parseInt(value));
                     break;
                 case "invert":
-                    if (length == 1) { System.out.println(this.descriptor.invert()); return; }
+                    if (length == 1) { System.out.println(this.builder.invert()); return; }
                     if (!("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)))
                         throw new IllegalArgumentException();
-                    this.descriptor.invert(Boolean.parseBoolean(value));
+                    this.builder.invert(Boolean.parseBoolean(value));
                     break;
                 case "scaleAmplitude":
-                    if (length == 1) { System.out.println(this.descriptor.scaleAmplitude()); return; }
-                    this.descriptor.scaleAmplitude(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.scaleAmplitude()); return; }
+                    this.builder.scaleAmplitude(Float.parseFloat(value));
                     break;
                 case "scaleOffset":
-                    if (length == 1) { System.out.println(this.descriptor.scaleOffset()); return; }
-                    this.descriptor.scaleOffset(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.scaleOffset()); return; }
+                    this.builder.scaleOffset(Float.parseFloat(value));
                     break;
                 case "range":
                     if (length == 1) {
-                        final float amp = this.descriptor.scaleAmplitude();
-                        final float ost = this.descriptor.scaleOffset();
+                        final float amp = this.builder.scaleAmplitude();
+                        final float ost = this.builder.scaleOffset();
                         final float min = -amp + ost;
                         final float max = amp + ost;
                         System.out.println(min + " ~ " + max);
@@ -337,20 +341,20 @@ public class NoiseViewer {
                         System.err.println("Missing second argument");
                         throw new IllegalArgumentException();
                     }
-                    this.descriptor.range(Float.parseFloat(value), Float.parseFloat(args[2]));
+                    this.builder.range(Float.parseFloat(value), Float.parseFloat(args[2]));
                     break;
                 case "minThreshold":
-                    if (length == 1) { System.out.println(this.descriptor.minThreshold()); return; }
-                    this.descriptor.minThreshold(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.minThreshold()); return; }
+                    this.builder.minThreshold(Float.parseFloat(value));
                     break;
                 case "maxThreshold":
-                    if (length == 1) { System.out.println(this.descriptor.maxThreshold()); return; }
-                    this.descriptor.maxThreshold(Float.parseFloat(value));
+                    if (length == 1) { System.out.println(this.builder.maxThreshold()); return; }
+                    this.builder.maxThreshold(Float.parseFloat(value));
                     break;
                 case "threshold":
                     if (length == 1) {
-                        final float min = this.descriptor.minThreshold();
-                        final float max = this.descriptor.maxThreshold();
+                        final float min = this.builder.minThreshold();
+                        final float max = this.builder.maxThreshold();
                         System.out.println(min + " ~ " + max);
                         return;
                     }
@@ -358,7 +362,7 @@ public class NoiseViewer {
                         System.err.println("Missing second argument");
                         throw new IllegalArgumentException();
                     }
-                    this.descriptor.threshold(Float.parseFloat(value), Float.parseFloat(args[2]));
+                    this.builder.threshold(Float.parseFloat(value), Float.parseFloat(args[2]));
                     break;
                 default:
                     System.err.println("Unknown key: " + key);
@@ -385,32 +389,44 @@ public class NoiseViewer {
             System.out.println("Now in " + (this.threeD ? "3D" : "2D"));
         }
 
-        void storeLookup() {
-            this.lookups.add(this.descriptor);
-            System.out.println("Added current settings to storage. Values were reset.");
-            System.out.println("You now have " + this.lookups.size() + " lookups in storage.");
-            this.descriptor = new NoiseDescriptor();
+        void convertToLookup() {
+            this.builder = new NoiseBuilder().noiseLookup(this.builder);
+            System.out.println("Converted previous settings to noise lookup. Set typed to cellular or warped to use.");
             this.regen();
         }
 
-        void applyLookups() {
-            System.out.println("Lookups in storage:");
-            for (final NoiseDescriptor lookup : this.lookups) {
-                System.out.println(" * " + lookup);
+        void storeReferences() {
+            this.references.add(this.builder);
+            System.out.println("Added current settings to storage. Values were reset.");
+            System.out.println("You now have " + this.references.size() + " lookups in storage.");
+            this.builder = new NoiseBuilder();
+            this.regen();
+        }
+
+        void applyReferences() {
+            System.out.println("References in storage:");
+            for (final NoiseBuilder reference : this.references) {
+                System.out.println(" * " + reference);
             }
-            this.descriptor.noiseLookup(this.lookups);
-            System.out.println("Lookups applied. Set type to multi or cell value to use.");
+            this.builder.references(this.references);
+            System.out.println("References applied. Set type to fractal, warped, or multi to use.");
         }
 
         void print() {
-            for (final String value : this.descriptor.toString().split(",\\s?")) {
+            for (final String value : this.builder.toString().split(",\\s?")) {
                 System.out.println(value);
             }
             System.out.println("Class: " + this.generator.getClass());
         }
 
+        void reset() {
+            this.references.clear();
+            this.builder = new NoiseBuilder();
+            this.regen();
+        }
+
         void regen() {
-            this.generator = this.descriptor.generate();
+            this.generator = this.builder.build();
             this.label.setIcon(new ImageIcon(this.createNextImage()));
         }
 

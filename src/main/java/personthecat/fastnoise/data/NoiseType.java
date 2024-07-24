@@ -12,8 +12,10 @@ public enum NoiseType {
     SIMPLEX2,
     SIMPLEX2S,
     CELLULAR,
-    WHITE_NOISE,
+    WHITE,
     CUBIC,
+    FRACTAL,
+    WARPED,
     MULTI;
 
     final Pattern pattern = EnumNamingService.createPattern(this);

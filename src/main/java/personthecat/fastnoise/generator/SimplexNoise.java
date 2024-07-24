@@ -1,7 +1,7 @@
 package personthecat.fastnoise.generator;
 
 import personthecat.fastnoise.FastNoise;
-import personthecat.fastnoise.data.NoiseDescriptor;
+import personthecat.fastnoise.data.NoiseBuilder;
 import personthecat.fastnoise.data.NoiseType;
 
 import static personthecat.fastnoise.util.NoiseUtils.fastFloor;
@@ -17,7 +17,7 @@ public class SimplexNoise extends FastNoise {
     private final static float G3 = (float) (1.0 / 6.0);
     private final static float G33 = G3 * 3 - 1;
 
-    public SimplexNoise(final NoiseDescriptor cfg) {
+    public SimplexNoise(final NoiseBuilder cfg) {
         super(cfg);
     }
 
@@ -26,8 +26,8 @@ public class SimplexNoise extends FastNoise {
     }
 
     @Override
-    public NoiseDescriptor toDescriptor() {
-        return super.toDescriptor().noise(NoiseType.SIMPLEX);
+    public NoiseBuilder toBuilder() {
+        return super.toBuilder().type(NoiseType.SIMPLEX);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package personthecat.fastnoise.generator;
 
 import personthecat.fastnoise.FastNoise;
-import personthecat.fastnoise.data.NoiseDescriptor;
+import personthecat.fastnoise.data.NoiseBuilder;
 import personthecat.fastnoise.data.NoiseType;
 
 import static personthecat.fastnoise.util.NoiseUtils.fastFloor;
@@ -21,7 +21,7 @@ public class OpenSimplex2SNoise extends FastNoise {
     private static final int Y_PRIME_2 = Y_PRIME << 1;
     private static final int Z_PRIME_2 = Z_PRIME << 1;
 
-    public OpenSimplex2SNoise(final NoiseDescriptor cfg) {
+    public OpenSimplex2SNoise(final NoiseBuilder cfg) {
         super(cfg);
     }
 
@@ -30,8 +30,8 @@ public class OpenSimplex2SNoise extends FastNoise {
     }
 
     @Override
-    public NoiseDescriptor toDescriptor() {
-        return super.toDescriptor().noise(NoiseType.SIMPLEX2S);
+    public NoiseBuilder toBuilder() {
+        return super.toBuilder().type(NoiseType.SIMPLEX2S);
     }
 
     // Moved these calculations before frequency from FastNoiseLite. Looks better (?)

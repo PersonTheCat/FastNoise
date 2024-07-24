@@ -1,18 +1,19 @@
 package personthecat.fastnoise.generator;
 
 import personthecat.fastnoise.FastNoise;
-import personthecat.fastnoise.data.NoiseDescriptor;
+import personthecat.fastnoise.data.NoiseBuilder;
 import personthecat.fastnoise.data.NoiseType;
 
 import static personthecat.fastnoise.util.NoiseUtils.fastFloor;
 import static personthecat.fastnoise.util.NoiseUtils.gradient1;
 import static personthecat.fastnoise.util.NoiseUtils.gradient2;
 import static personthecat.fastnoise.util.NoiseUtils.gradient3;
+import static personthecat.fastnoise.util.NoiseUtils.interpolateHermite;
 import static personthecat.fastnoise.util.NoiseUtils.lerp;
 
 public class PerlinNoise extends FastNoise {
 
-    public PerlinNoise(final NoiseDescriptor cfg) {
+    public PerlinNoise(final NoiseBuilder cfg) {
         super(cfg);
     }
 
@@ -21,8 +22,8 @@ public class PerlinNoise extends FastNoise {
     }
 
     @Override
-    public NoiseDescriptor toDescriptor() {
-        return super.toDescriptor().noise(NoiseType.PERLIN);
+    public NoiseBuilder toBuilder() {
+        return super.toBuilder().type(NoiseType.PERLIN);
     }
 
     @Override
@@ -30,7 +31,7 @@ public class PerlinNoise extends FastNoise {
         final int x0 = fastFloor(x);
         final float xd0 = x - x0;
 
-        final float xs = this.interpolate(xd0);
+        final float xs = interpolateHermite(xd0);
         final float gradA = gradient1(seed, x0, xd0);
         final float gradB = gradient1(seed, x0 + 1, xd0 - 1);
         return 2.08841887664F * lerp(gradA, gradB, xs);
@@ -43,8 +44,8 @@ public class PerlinNoise extends FastNoise {
         final int x1 = x0 + 1;
         final int y1 = y0 + 1;
 
-        final float xs = this.interpolate(x - x0);
-        final float ys = this.interpolate(y - y0);
+        final float xs = interpolateHermite(x - x0);
+        final float ys = interpolateHermite(y - y0);
 
         final float xd0 = x - x0;
         final float yd0 = y - y0;
@@ -66,9 +67,9 @@ public class PerlinNoise extends FastNoise {
         final int y1 = y0 + 1;
         final int z1 = z0 + 1;
 
-        final float xs = this.interpolate(x - x0);
-        final float ys = this.interpolate(y - y0);
-        final float zs = this.interpolate(z - z0);
+        final float xs = interpolateHermite(x - x0);
+        final float ys = interpolateHermite(y - y0);
+        final float zs = interpolateHermite(z - z0);
 
         final float xd0 = x - x0;
         final float yd0 = y - y0;

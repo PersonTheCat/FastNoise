@@ -1,14 +1,14 @@
 package personthecat.fastnoise.generator;
 
 import personthecat.fastnoise.FastNoise;
-import personthecat.fastnoise.data.CellularDistanceType;
-import personthecat.fastnoise.data.CellularReturnType;
+import personthecat.fastnoise.data.DistanceType;
+import personthecat.fastnoise.data.ReturnType;
 import personthecat.fastnoise.data.Float2;
 import personthecat.fastnoise.data.Float3;
-import personthecat.fastnoise.data.NoiseDescriptor;
+import personthecat.fastnoise.data.NoiseBuilder;
 import personthecat.fastnoise.data.NoiseType;
-import personthecat.fastnoise.function.CellularDistance;
-import personthecat.fastnoise.function.CellularReturn;
+import personthecat.fastnoise.function.DistanceFunction;
+import personthecat.fastnoise.function.ReturnFunction;
 
 import static personthecat.fastnoise.util.NoiseTables.CELL_2D;
 import static personthecat.fastnoise.util.NoiseTables.CELL_3D;
@@ -20,46 +20,40 @@ import static personthecat.fastnoise.util.NoiseUtils.value3;
 
 public class CellularNoise extends FastNoise {
 
-    private final CellularDistanceType distanceType;
-    private final CellularReturnType returnType;
-    private final CellularDistance distanceFunction;
-    private final CellularReturn returnFunction;
+    private final DistanceType distanceType;
+    private final ReturnType returnType;
+    private final DistanceFunction distanceFunction;
+    private final ReturnFunction returnFunction;
     private final FastNoise lookup;
     private final float jitterX;
     private final float jitterY;
     private final float jitterZ;
 
-    public CellularNoise(final NoiseDescriptor cfg) {
+    public CellularNoise(final NoiseBuilder cfg) {
         super(cfg);
         this.distanceType = cfg.distance();
         this.returnType = cfg.cellularReturn();
         this.distanceFunction = cfg.distanceFunction();
         this.returnFunction = cfg.returnFunction();
-        this.lookup = createLookup(cfg);
+        this.lookup = cfg.buildLookup();
         this.jitterX = cfg.jitterX();
         this.jitterY = cfg.jitterY();
         this.jitterZ = cfg.jitterZ();
     }
 
     public CellularNoise(final int seed) {
-        this(FastNoise.createDescriptor().seed(seed));
-    }
-
-    private static FastNoise createLookup(final NoiseDescriptor cfg) {
-        if (cfg.noiseLookup().length > 0) {
-            return cfg.noiseLookup()[0].generate();
-        }
-        return FastNoise.dummy();
+        this(FastNoise.builder().seed(seed));
     }
 
     @Override
-    public NoiseDescriptor toDescriptor() {
-        return super.toDescriptor()
-            .noise(NoiseType.CELLULAR)
+    public NoiseBuilder toBuilder() {
+        return super.toBuilder()
+            .type(NoiseType.CELLULAR)
             .distance(this.distanceType)
             .cellularReturn(this.returnType)
             .distanceFunction(this.distanceFunction)
             .returnFunction(this.returnFunction)
+            .noiseLookup(this.lookup != DUMMY ? this.lookup.toBuilder() : null)
             .jitterX(this.jitterX)
             .jitterY(this.jitterY)
             .jitterZ(this.jitterZ);

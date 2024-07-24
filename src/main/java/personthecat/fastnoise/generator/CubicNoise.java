@@ -1,7 +1,7 @@
 package personthecat.fastnoise.generator;
 
 import personthecat.fastnoise.FastNoise;
-import personthecat.fastnoise.data.NoiseDescriptor;
+import personthecat.fastnoise.data.NoiseBuilder;
 import personthecat.fastnoise.data.NoiseType;
 
 import static personthecat.fastnoise.util.NoiseUtils.cubicLerp;
@@ -14,7 +14,7 @@ public class CubicNoise extends FastNoise {
     private final static float CUBIC_2D_BOUNDING = 1 / (float) (1.5 * 1.5);
     private final static float CUBIC_3D_BOUNDING = 1 / (float) (1.5 * 1.5 * 1.5);
 
-    public CubicNoise(final NoiseDescriptor cfg) {
+    public CubicNoise(final NoiseBuilder cfg) {
         super(cfg);
     }
 
@@ -23,8 +23,8 @@ public class CubicNoise extends FastNoise {
     }
 
     @Override
-    public NoiseDescriptor toDescriptor() {
-        return super.toDescriptor().noise(NoiseType.CUBIC);
+    public NoiseBuilder toBuilder() {
+        return super.toBuilder().type(NoiseType.CUBIC);
     }
 
     @Override

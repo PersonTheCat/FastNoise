@@ -1,11 +1,11 @@
 package personthecat.fastnoise.generator;
 
 import personthecat.fastnoise.FastNoise;
-import personthecat.fastnoise.data.DomainWarpType;
+import personthecat.fastnoise.data.WarpType;
 import personthecat.fastnoise.data.Float2;
 import personthecat.fastnoise.data.Float3;
-import personthecat.fastnoise.data.NoiseDescriptor;
-import personthecat.fastnoise.function.NoiseProvider;
+import personthecat.fastnoise.data.NoiseBuilder;
+import personthecat.fastnoise.data.NoiseType;
 
 import static personthecat.fastnoise.util.NoiseTables.CELL_2D;
 import static personthecat.fastnoise.util.NoiseTables.CELL_2DL;
@@ -17,6 +17,7 @@ import static personthecat.fastnoise.util.NoiseUtils.fastFloor;
 import static personthecat.fastnoise.util.NoiseUtils.fastRound;
 import static personthecat.fastnoise.util.NoiseUtils.hash2;
 import static personthecat.fastnoise.util.NoiseUtils.hash3;
+import static personthecat.fastnoise.util.NoiseUtils.interpolateHermite;
 import static personthecat.fastnoise.util.NoiseUtils.lerp;
 import static personthecat.fastnoise.util.NoiseValues.X_PRIME;
 import static personthecat.fastnoise.util.NoiseValues.Y_PRIME;
@@ -26,7 +27,7 @@ import static personthecat.fastnoise.util.NoiseValues.G2;
 import static personthecat.fastnoise.util.NoiseValues.R3;
 
 @SuppressWarnings("unused")
-public abstract class DomainWarpedNoise extends FastNoise {
+public abstract class WarpedNoise extends FastNoise {
 
     protected final FastNoise reference;
     protected final float warpAmplitudeX;
@@ -36,7 +37,7 @@ public abstract class DomainWarpedNoise extends FastNoise {
     protected final float warpFrequencyY;
     protected final float warpFrequencyZ;
 
-    public DomainWarpedNoise(final NoiseDescriptor cfg, final FastNoise reference) {
+    public WarpedNoise(final NoiseBuilder cfg, final FastNoise reference) {
         super(cfg);
         this.reference = reference;
         this.warpAmplitudeX = cfg.warpAmplitudeX();
@@ -47,28 +48,15 @@ public abstract class DomainWarpedNoise extends FastNoise {
         this.warpFrequencyZ = cfg.warpFrequencyZ();
     }
 
-    public DomainWarpedNoise(final int seed, final FastNoise reference) {
-        this(FastNoise.createDescriptor().seed(seed), reference);
+    public WarpedNoise(final int seed, final FastNoise reference) {
+        this(FastNoise.builder().seed(seed), reference);
     }
 
-    public static FastNoise create(final NoiseDescriptor cfg, final NoiseProvider provider) {
-        return create(cfg, provider.apply(cfg));
-    }
-
-    public static FastNoise create(final NoiseDescriptor cfg, final FastNoise reference) {
-        switch (cfg.warp()) {
-            case BASIC_GRID: return new BasicGrid(cfg, reference);
-            case SIMPLEX2: return new Simplex2(cfg, reference);
-            case SIMPLEX2_REDUCED: return new Simplex2Reduced(cfg, reference);
-            default: return reference;
-        }
-    }
-
-    @Override // this will get broken by NoiseType.FRACTAL due to loss of noiseLookup
-    public NoiseDescriptor toDescriptor() {
-        final NoiseDescriptor reference = this.reference.toDescriptor();
-        return super.toDescriptor()
-            .noise(reference.noise())
+    @Override
+    public NoiseBuilder toBuilder() {
+        return super.toBuilder()
+            .type(NoiseType.WARPED)
+            .reference(this.reference.toBuilder())
             .warpAmplitudeX(this.warpAmplitudeX)
             .warpAmplitudeY(this.warpAmplitudeY)
             .warpAmplitudeZ(this.warpAmplitudeZ)
@@ -77,40 +65,61 @@ public abstract class DomainWarpedNoise extends FastNoise {
             .warpFrequencyZ(this.warpFrequencyZ);
     }
 
-    @Override
-    public abstract float getNoise(final float x, final float y);
-
-    @Override
-    public abstract float getNoise(final float x, final float y, final float z);
+    protected abstract Float2 warp(int seed, float x, float y);
+    protected abstract Float3 warp(int seed, float x, float y, float z);
 
     @Override
     public float getSingle(int seed, float x) {
-        return this.reference.getSingle(seed, x);
+        return this.getSingle(seed, x, 1337);
     }
 
     @Override
     public float getSingle(int seed, float x, float y) {
-        return this.reference.getSingle(seed, x, y);
+        final Float2 vec = this.warp(seed, x, y);
+        return this.reference.getSingle(seed, vec.x, vec.y);
     }
 
     @Override
     public float getSingle(int seed, float x, float y, float z) {
-        return this.reference.getSingle(seed, x, y, z);
+        final Float3 vec = this.warp(seed, x, y, z);
+        return this.reference.getSingle(seed, vec.x, vec.y, vec.z);
     }
 
     @Override
-    public float interpolate(final float t) {
-        return t;
+    public float getNoise(float x) {
+        return this.getNoise(x, 1337);
     }
 
-    public static class BasicGrid extends DomainWarpedNoise {
+    @Override
+    public float getNoise(float x, float y) {
+        x += this.offsetX;
+        y += this.offsetY;
+        final Float2 vec = this.warp(this.seed, x, y);
+        x = vec.x * this.frequencyX;
+        y = vec.y * this.frequencyY;
+        return this.reference.getSingle(this.seed, x, y);
+    }
 
-        public BasicGrid(final NoiseDescriptor cfg, final FastNoise reference) {
+    @Override
+    public float getNoise(float x, float y, float z) {
+        x += this.offsetX;
+        y += this.offsetY;
+        z += this.offsetZ;
+        final Float3 vec = this.warp(this.seed, x, y, z);
+        x = vec.x * this.frequencyX;
+        y = vec.y * this.frequencyY;
+        z = vec.z * this.frequencyZ;
+        return this.reference.getSingle(this.seed, x, y, z);
+    }
+
+    public static class BasicGrid extends WarpedNoise {
+
+        public BasicGrid(final NoiseBuilder cfg, final FastNoise reference) {
             super(cfg, reference);
         }
 
         @Override
-        public float getNoise(float x, float y) {
+        protected Float2 warp(int seed, float x, float y) {
             final float xf = x * this.warpFrequencyX;
             final float yf = y * this.warpFrequencyY;
 
@@ -119,8 +128,8 @@ public abstract class DomainWarpedNoise extends FastNoise {
             final int x1 = x0 + 1;
             final int y1 = y0 + 1;
 
-            final float xs = this.interpolate(xf - x0);
-            final float ys = this.interpolate(yf - y0);
+            final float xs = interpolateHermite(xf - x0);
+            final float ys = interpolateHermite(yf - y0);
 
             Float2 vec0 = CELL_2D[hash2(this.seed, x0, y0) & 255];
             Float2 vec1 = CELL_2D[hash2(this.seed, x1, y0) & 255];
@@ -137,18 +146,11 @@ public abstract class DomainWarpedNoise extends FastNoise {
             x += lerp(lx0x, lx1x, ys) * (this.warpAmplitudeX / 0.45F);
             y += lerp(ly0x, ly1x, ys) * (this.warpAmplitudeY / 0.45F);
 
-            x *= this.frequencyX;
-            y *= this.frequencyY;
-
-            return this.reference.getSingle(this.seed, x, y);
+            return new Float2(x, y);
         }
 
         @Override
-        public float getNoise(float x, float y, float z) {
-            x += this.offsetX;
-            y += this.offsetY;
-            z += this.offsetZ;
-
+        protected Float3 warp(int seed, float x, float y, float z) {
             final float xf = x * this.warpFrequencyX;
             final float yf = y * this.warpFrequencyY;
             final float zf = z * this.warpFrequencyZ;
@@ -160,9 +162,9 @@ public abstract class DomainWarpedNoise extends FastNoise {
             final int y1 = y0 + 1;
             final int z1 = z0 + 1;
 
-            final float xs = this.interpolate(xf - x0);
-            final float ys = this.interpolate(yf - y0);
-            final float zs = this.interpolate(zf - z0);
+            final float xs = interpolateHermite(xf - x0);
+            final float ys = interpolateHermite(yf - y0);
+            final float zs = interpolateHermite(zf - z0);
 
             Float3 vec0 = CELL_3D[hash3(this.seed, x0, y0, z0) & 255];
             Float3 vec1 = CELL_3D[hash3(this.seed, x1, y0, z0) & 255];
@@ -200,27 +202,23 @@ public abstract class DomainWarpedNoise extends FastNoise {
             y += lerp(ly0y, lerp(ly0x, ly1x, ys), zs) * (this.warpAmplitudeY / 0.45F);
             z += lerp(lz0y, lerp(lz0x, lz1x, ys), zs) * (this.warpAmplitudeZ / 0.45F);
 
-            x *= this.frequencyX;
-            y *= this.frequencyY;
-            z *= this.frequencyZ;
-
-            return this.reference.getSingle(this.seed, x, y, z);
+            return new Float3(x, y, z);
         }
 
         @Override
-        public NoiseDescriptor toDescriptor() {
-            return super.toDescriptor().warp(DomainWarpType.BASIC_GRID);
+        public NoiseBuilder toBuilder() {
+            return super.toBuilder().warp(WarpType.BASIC_GRID);
         }
     }
 
-    public static class Simplex2 extends DomainWarpedNoise {
+    public static class Simplex2 extends WarpedNoise {
 
-        public Simplex2(final NoiseDescriptor cfg, final FastNoise reference) {
+        public Simplex2(final NoiseBuilder cfg, final FastNoise reference) {
             super(cfg, reference);
         }
 
         @Override
-        public float getNoise(float x, float y) {
+        protected Float2 warp(int seed, float x, float y) {
             float xs = x * this.warpFrequencyX;
             float ys = y * this.warpFrequencyY;
 
@@ -321,13 +319,11 @@ public abstract class DomainWarpedNoise extends FastNoise {
             x += vx * this.warpAmplitudeX * 38.283687591552734375f;
             y += vy * this.warpAmplitudeY * 38.283687591552734375f;
 
-            x *= this.frequencyX;
-            y *= this.frequencyY;
-            return this.reference.getSingle(this.seed, x, y);
+            return new Float2(x, y);
         }
 
         @Override
-        public float getNoise(float x, float y, float z) {
+        protected Float3 warp(int seed, float x, float y, float z) {
             float xr = x * this.warpFrequencyX;
             float yr = y * this.warpFrequencyY;
             float zr = z * this.warpFrequencyZ;
@@ -359,7 +355,6 @@ public abstract class DomainWarpedNoise extends FastNoise {
             float vx, vy, vz;
             vx = vy = vz = 0;
 
-            int seed = this.seed;
             float a = (0.6f - x0 * x0) - (y0 * y0 + z0 * z0);
             for (int l = 0; ; l++) {
                 if (a > 0) {
@@ -448,34 +443,27 @@ public abstract class DomainWarpedNoise extends FastNoise {
                 seed += 1293373;
             }
 
-            x += this.offsetX;
-            y += this.offsetY;
-            z += this.offsetZ;
-
             x += vx * (this.warpAmplitudeX * 32.69428253173828125f);
             y += vy * (this.warpAmplitudeY * 32.69428253173828125f);
             z += vz * (this.warpAmplitudeZ * 32.69428253173828125f);
 
-            x *= this.frequencyX;
-            y *= this.frequencyY;
-            z *= this.frequencyZ;
-            return this.reference.getSingle(this.seed, x, y, z);
+            return new Float3(x, y, z);
         }
 
         @Override
-        public NoiseDescriptor toDescriptor() {
-            return super.toDescriptor().warp(DomainWarpType.SIMPLEX2);
+        public NoiseBuilder toBuilder() {
+            return super.toBuilder().warp(WarpType.SIMPLEX2);
         }
     }
 
-    public static class Simplex2Reduced extends DomainWarpedNoise {
+    public static class Simplex2Reduced extends WarpedNoise {
 
-        public Simplex2Reduced(final NoiseDescriptor cfg, final FastNoise reference) {
+        public Simplex2Reduced(final NoiseBuilder cfg, final FastNoise reference) {
             super(cfg, reference);
         }
 
         @Override
-        public float getNoise(float x, float y) {
+        protected Float2 warp(int seed, float x, float y) {
             float xs = x * this.warpFrequencyX;
             float ys = y * this.warpFrequencyY;
 
@@ -546,13 +534,11 @@ public abstract class DomainWarpedNoise extends FastNoise {
             x += vx * this.warpAmplitudeX * 16.0f;
             y += vy * this.warpAmplitudeY * 16.0f;
 
-            x *= this.frequencyX;
-            y *= this.frequencyY;
-            return this.reference.getSingle(this.seed, x, y);
+            return new Float2(x, y);
         }
 
         @Override
-        public float getNoise(float x, float y, float z) {
+        protected Float3 warp(int seed, float x, float y, float z) {
             float xr = x * this.warpFrequencyX;
             float yr = y * this.warpFrequencyY;
             float zr = z * this.warpFrequencyZ;
@@ -584,7 +570,6 @@ public abstract class DomainWarpedNoise extends FastNoise {
             float vx, vy, vz;
             vx = vy = vz = 0;
 
-            int seed = this.seed;
             float a = (0.6f - x0 * x0) - (y0 * y0 + z0 * z0);
             for (int l = 0; ; l++) {
                 if (a > 0) {
@@ -645,23 +630,16 @@ public abstract class DomainWarpedNoise extends FastNoise {
                 seed += 1293373;
             }
 
-            x += this.offsetX;
-            y += this.offsetY;
-            z += this.offsetZ;
-
             x += vx * (this.warpAmplitudeX * 7.71604938271605f);
             y += vy * (this.warpAmplitudeY * 7.71604938271605f);
             z += vz * (this.warpAmplitudeZ * 7.71604938271605f);
 
-            x *= this.frequencyX;
-            y *= this.frequencyY;
-            z *= this.frequencyZ;
-            return this.reference.getSingle(this.seed, x, y, z);
+            return new Float3(x, y, z);
         }
 
         @Override
-        public NoiseDescriptor toDescriptor() {
-            return super.toDescriptor().warp(DomainWarpType.SIMPLEX2_REDUCED);
+        public NoiseBuilder toBuilder() {
+            return super.toBuilder().warp(WarpType.SIMPLEX2_REDUCED);
         }
     }
 }

@@ -1,7 +1,7 @@
 package personthecat.fastnoise.generator;
 
 import personthecat.fastnoise.FastNoise;
-import personthecat.fastnoise.data.NoiseDescriptor;
+import personthecat.fastnoise.data.NoiseBuilder;
 import personthecat.fastnoise.data.NoiseType;
 
 import static personthecat.fastnoise.util.NoiseUtils.castFloatToInt;
@@ -11,7 +11,7 @@ import static personthecat.fastnoise.util.NoiseUtils.value3;
 
 public class WhiteNoise extends FastNoise {
 
-    public WhiteNoise(final NoiseDescriptor cfg) {
+    public WhiteNoise(final NoiseBuilder cfg) {
         super(cfg);
     }
 
@@ -20,8 +20,8 @@ public class WhiteNoise extends FastNoise {
     }
 
     @Override
-    public NoiseDescriptor toDescriptor() {
-        return super.toDescriptor().noise(NoiseType.WHITE_NOISE);
+    public NoiseBuilder toBuilder() {
+        return super.toBuilder().type(NoiseType.WHITE);
     }
 
     @Override

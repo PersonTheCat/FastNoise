@@ -11,7 +11,8 @@ public enum MultiType {
     AVG,
     MUL,
     DIV,
-    SUM;
+    SUM,
+    FUNCTION;
 
     final Pattern pattern = EnumNamingService.createPattern(this);
     final String formatted = EnumNamingService.formatName(this);

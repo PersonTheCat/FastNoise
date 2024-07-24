@@ -5,7 +5,6 @@ import personthecat.fastnoise.data.DomainWarpType;
 import personthecat.fastnoise.data.Float2;
 import personthecat.fastnoise.data.Float3;
 import personthecat.fastnoise.data.NoiseDescriptor;
-import personthecat.fastnoise.data.NoiseType;
 import personthecat.fastnoise.function.NoiseProvider;
 
 import static personthecat.fastnoise.util.NoiseTables.CELL_2D;

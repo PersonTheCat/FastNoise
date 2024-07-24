@@ -3,6 +3,7 @@ package personthecat.fastnoise.generator;
 import personthecat.fastnoise.FastNoise;
 import personthecat.fastnoise.data.MultiType;
 import personthecat.fastnoise.data.NoiseDescriptor;
+import personthecat.fastnoise.function.MultiFunction;
 
 import java.util.stream.Stream;
 
@@ -366,6 +367,36 @@ public abstract class MultiGenerator extends FastNoise {
         @Override
         public NoiseDescriptor toDescriptor() {
             return super.toDescriptor().multi(MultiType.SUM);
+        }
+    }
+
+    public static class Function extends MultiGenerator {
+
+        private final MultiFunction multiFunction;
+
+        public Function(final NoiseDescriptor cfg) {
+            super(cfg);
+            this.multiFunction = cfg.multiFunction();
+        }
+
+        @Override
+        public float getNoise(final float x) {
+            return this.multiFunction.getNoise(x, 1337, this.references);
+        }
+
+        @Override
+        public float getNoise(final float x, final float y) {
+            return this.multiFunction.getNoise(x, y, this.references);
+        }
+
+        @Override
+        public float getNoise(final float x, final float y, final float z) {
+            return this.multiFunction.getNoise(x, y, z, this.references);
+        }
+
+        @Override
+        public NoiseDescriptor toDescriptor() {
+            return super.toDescriptor().multiFunction(this.multiFunction);
         }
     }
 }

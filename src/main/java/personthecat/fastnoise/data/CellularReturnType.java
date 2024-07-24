@@ -18,7 +18,8 @@ public enum CellularReturnType {
     DISTANCE3_ADD,
     DISTANCE3_SUB,
     DISTANCE3_MUL,
-    DISTANCE3_DIV;
+    DISTANCE3_DIV,
+    FUNCTION;
 
     final Pattern pattern = EnumNamingService.createPattern(this);
     final String formatted = EnumNamingService.formatName(this);

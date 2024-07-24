@@ -3,6 +3,10 @@ package personthecat.fastnoise.data;
 import lombok.Data;
 import lombok.EqualsAndHashCode.Exclude;
 import lombok.experimental.Accessors;
+import personthecat.fastnoise.function.CellularDistance;
+import personthecat.fastnoise.function.CellularReturn;
+import personthecat.fastnoise.function.FractalFunction;
+import personthecat.fastnoise.function.MultiFunction;
 import personthecat.fastnoise.function.NoiseProvider;
 import personthecat.fastnoise.function.NoiseScalar;
 import personthecat.fastnoise.generator.*;
@@ -13,7 +17,7 @@ import java.util.Collection;
 @Data
 @Accessors(fluent = true)
 @SuppressWarnings({"unused", "UnusedReturnValue"})
-public class NoiseDescriptor {
+public class NoiseDescriptor implements Cloneable {
 
     private NoiseProvider provider = d -> this.createGenerator();
     private NoiseType noise = NoiseType.SIMPLEX;
@@ -21,6 +25,10 @@ public class NoiseDescriptor {
     private DomainWarpType warp = DomainWarpType.NONE;
     private CellularDistanceType distance = CellularDistanceType.EUCLIDEAN;
     private CellularReturnType cellularReturn = CellularReturnType.CELL_VALUE;
+    private CellularDistance distanceFunction = CellularDistance.NO_OP;
+    private CellularReturn returnFunction = CellularReturn.NO_OP;
+    private MultiFunction multiFunction = MultiFunction.NO_OP;
+    private FractalFunction fractalFunction = FractalFunction.NO_OP;
     private NoiseDescriptor[] noiseLookup = {};
     private MultiType multi = MultiType.SUM;
     private NoiseScalar scalar = null;
@@ -51,6 +59,70 @@ public class NoiseDescriptor {
     @Exclude private float scaleOffset = 0.0F;
     @Exclude private float minThreshold = 0.0F;
     @Exclude private float maxThreshold = 1.0F;
+
+    public CellularReturn returnFunction() {
+        return this.returnFunction;
+    }
+
+    public NoiseDescriptor returnFunction(final CellularReturn returnFunction) {
+        this.returnFunction = returnFunction;
+        return this.cellularReturn(CellularReturnType.FUNCTION);
+    }
+
+    public NoiseDescriptor returnFunction(final CellularReturn.D2 d2) {
+        return this.returnFunction((CellularReturn) d2);
+    }
+
+    public NoiseDescriptor returnFunction(final CellularReturn.D3 d3) {
+        return this.returnFunction((CellularReturn) d3);
+    }
+
+    public CellularDistance distanceFunction() {
+        return this.distanceFunction;
+    }
+
+    public NoiseDescriptor distanceFunction(final CellularDistance distanceFunction) {
+        this.distanceFunction = distanceFunction;
+        return this.distance(CellularDistanceType.FUNCTION);
+    }
+
+    public NoiseDescriptor distanceFunction(final CellularDistance.D2 d2) {
+        return this.distanceFunction((CellularDistance) d2);
+    }
+
+    public NoiseDescriptor distanceFunction(final CellularDistance.D3 d3) {
+        return this.distanceFunction((CellularDistance) d3);
+    }
+
+    public MultiFunction multiFunction() {
+        return this.multiFunction;
+    }
+
+    public NoiseDescriptor multiFunction(final MultiFunction multiFunction) {
+        this.multiFunction = multiFunction;
+        return this.multi(MultiType.FUNCTION);
+    }
+
+    public NoiseDescriptor multiFunction(final MultiFunction.D2 d2) {
+        return this.multiFunction((MultiFunction) d2);
+    }
+
+    public NoiseDescriptor multiFunction(final MultiFunction.D3 d3) {
+        return this.multiFunction((MultiFunction) d3);
+    }
+
+    public NoiseDescriptor multiFunction(final MultiFunction.Combiner combiner) {
+        return this.multiFunction((MultiFunction) combiner);
+    }
+
+    public FractalFunction fractalFunction() {
+        return this.fractalFunction;
+    }
+
+    public NoiseDescriptor fractalFunction(final FractalFunction fractalFunction) {
+        this.fractalFunction = fractalFunction;
+        return this.fractal(FractalType.FUNCTION);
+    }
 
     public NoiseDescriptor[] noiseLookup() {
         return this.noiseLookup;
@@ -122,7 +194,9 @@ public class NoiseDescriptor {
 
     private FastNoise createGenerator() {
         FastNoise generator = this.getBasicGenerator();
-        generator = FractalNoise.create(this, generator);
+        if (this.fractal != FractalType.NONE) {
+            generator = new FractalNoise(this, generator);
+        }
         generator = DomainWarpedNoise.create(this, generator);
         return ScaledNoise.create(this, generator);
     }
@@ -134,28 +208,10 @@ public class NoiseDescriptor {
             case SIMPLEX: return new SimplexNoise(this);
             case SIMPLEX2: return new OpenSimplex2Noise(this);
             case SIMPLEX2S: return new OpenSimplex2SNoise(this);
-            case CELLULAR: return this.getCellularGenerator();
+            case CELLULAR: return new CellularNoise(this);
             case WHITE_NOISE: return new WhiteNoise(this);
             case CUBIC: return new CubicNoise(this);
             default : return this.getMultiGenerator();
-        }
-    }
-
-    private FastNoise getCellularGenerator() {
-        switch (this.cellularReturn) {
-            case CELL_VALUE: return new Cellular1EdgeNoise.CellValue(this);
-            case NOISE_LOOKUP: return new Cellular1EdgeNoise.NoiseLookup(this);
-            case DISTANCE: return new Cellular1EdgeNoise.Distance(this);
-            case DISTANCE2: return new Cellular2EdgeNoise.Distance(this);
-            case DISTANCE2_ADD: return new Cellular2EdgeNoise.Add(this);
-            case DISTANCE2_SUB: return new Cellular2EdgeNoise.Sub(this);
-            case DISTANCE2_MUL: return new Cellular2EdgeNoise.Mul(this);
-            case DISTANCE2_DIV: return new Cellular2EdgeNoise.Div(this);
-            case DISTANCE3: return new Cellular3EdgeNoise.Distance(this);
-            case DISTANCE3_ADD: return new Cellular3EdgeNoise.Add(this);
-            case DISTANCE3_SUB: return new Cellular3EdgeNoise.Sub(this);
-            case DISTANCE3_MUL: return new Cellular3EdgeNoise.Mul(this);
-            default: return new Cellular3EdgeNoise.Div(this);
         }
     }
 
@@ -169,11 +225,25 @@ public class NoiseDescriptor {
             case AVG: return new MultiGenerator.Avg(this);
             case MUL: return new MultiGenerator.Mul(this);
             case DIV: return new MultiGenerator.Div(this);
-            default: return new MultiGenerator.Sum(this);
+            case SUM: return new MultiGenerator.Sum(this);
+            default: return new MultiGenerator.Function(this);
         }
     }
 
     public FastNoise generate() {
         return this.provider.apply(this);
+    }
+
+    @Override
+    public NoiseDescriptor clone() {
+        try {
+            final NoiseDescriptor clone = (NoiseDescriptor) super.clone();
+            for (int i = 0; i < clone.noiseLookup.length; i++) {
+                clone.noiseLookup[i] = clone.noiseLookup[i].clone();
+            }
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

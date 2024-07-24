@@ -8,7 +8,8 @@ import java.util.regex.Pattern;
 public enum CellularDistanceType {
     EUCLIDEAN,
     MANHATTAN,
-    NATURAL;
+    NATURAL,
+    FUNCTION;
 
     final Pattern pattern = EnumNamingService.createPattern(this);
     final String formatted = EnumNamingService.formatName(this);

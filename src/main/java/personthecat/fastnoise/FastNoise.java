@@ -5,6 +5,7 @@ import personthecat.fastnoise.generator.DummyNoiseWrapper;
 
 @SuppressWarnings("unused")
 public abstract class FastNoise {
+    private static final FastNoise DUMMY = createWrapper().generatePassthrough();
 
     protected final int seed;
     protected final float frequencyX;
@@ -44,6 +45,10 @@ public abstract class FastNoise {
 
     public static DummyNoiseWrapper createWrapper() {
         return new DummyNoiseWrapper();
+    }
+
+    public static FastNoise dummy() {
+        return DUMMY;
     }
 
     public NoiseDescriptor toDescriptor() {

@@ -10,6 +10,7 @@ public enum FractalType {
     BILLOW,
     RIGID_MULTI,
     PING_PONG,
+    FUNCTION,
     NONE;
 
     final Pattern pattern = EnumNamingService.createPattern(this);

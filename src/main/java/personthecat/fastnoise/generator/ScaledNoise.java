@@ -10,7 +10,7 @@ public class ScaledNoise extends FastNoise {
     private final ScaleFunction scaleFunction;
 
     public ScaledNoise(final FastNoise reference, final ScaleFunction scaleFunction) {
-        super(0);
+        super(reference.toBuilder());
         this.reference = reference;
         this.scaleFunction = scaleFunction;
     }

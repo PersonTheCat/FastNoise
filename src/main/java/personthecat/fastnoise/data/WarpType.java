@@ -9,6 +9,7 @@ public enum WarpType {
     SIMPLEX2,
     SIMPLEX2_REDUCED,
     BASIC_GRID,
+    NOISE_LOOKUP,
     NONE;
 
     final Pattern pattern = EnumNamingService.createPattern(this);

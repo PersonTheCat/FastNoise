@@ -160,6 +160,7 @@ public class CellularNoise extends FastNoise {
                 final Float2 vec = CELL_2D[hash2(this.seed, xc, yc) & 255];
                 return this.lookup.getNoise(xc + vec.x * this.jitterX, yc + vec.y * this.jitterY);
             case DISTANCE: return distance - 1;
+            case DISTANCE_SQRT: return (float) -Math.sqrt(distance);
             case DISTANCE2: return distance2 - 1;
             case DISTANCE2_ADD: return distance2 + distance - 1;
             case DISTANCE2_SUB: return distance2 - distance - 1;
@@ -287,6 +288,7 @@ public class CellularNoise extends FastNoise {
                 final Float3 vec = CELL_3D[hash3(this.seed, xc, yc, zc) & 255];
                 return this.lookup.getNoise(xc + vec.x * this.jitterX, yc + vec.y * this.jitterY, zc + vec.z * this.jitterZ);
             case DISTANCE: return distance - 1;
+            case DISTANCE_SQRT: return (float) -Math.sqrt(distance);
             case DISTANCE2: return distance2 - 1;
             case DISTANCE2_ADD: return distance2 + distance - 1;
             case DISTANCE2_SUB: return distance2 - distance - 1;

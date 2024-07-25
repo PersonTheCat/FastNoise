@@ -642,4 +642,34 @@ public abstract class WarpedNoise extends FastNoise {
             return super.toBuilder().warp(WarpType.SIMPLEX2_REDUCED);
         }
     }
+
+    public static class NoiseLookup extends WarpedNoise {
+
+        private final FastNoise noiseLookup;
+
+        public NoiseLookup(NoiseBuilder cfg, FastNoise reference) {
+            super(cfg, reference);
+            this.noiseLookup = cfg.buildLookup();
+        }
+
+        @Override
+        protected Float2 warp(int seed, float x, float y) {
+            x += this.noiseLookup.getSingle(seed, x * this.warpFrequencyX, y * this.warpFrequencyY) * this.warpAmplitudeX;
+            y += this.noiseLookup.getSingle(seed + 1, x * this.warpFrequencyX, y * this.warpFrequencyY) * this.warpAmplitudeY;
+            return new Float2(x, y);
+        }
+
+        @Override
+        protected Float3 warp(int seed, float x, float y, float z) {
+            x += this.noiseLookup.getSingle(seed, x * this.warpFrequencyX, y * this.warpFrequencyY, z * this.warpFrequencyZ) * this.warpAmplitudeX;
+            y += this.noiseLookup.getSingle(seed + 1, x * this.warpFrequencyX, y * this.warpFrequencyY, z * this.warpFrequencyZ) * this.warpAmplitudeY;
+            z += this.noiseLookup.getSingle(seed + 2, x * this.warpFrequencyX, y * this.warpFrequencyY, z * this.warpFrequencyZ) * this.warpAmplitudeZ;
+            return new Float3(x, y, z);
+        }
+
+        @Override
+        public NoiseBuilder toBuilder() {
+            return super.toBuilder().warp(WarpType.NOISE_LOOKUP).noiseLookup(this.noiseLookup.toBuilder());
+        }
+    }
 }

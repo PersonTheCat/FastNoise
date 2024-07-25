@@ -4,6 +4,8 @@ import personthecat.fastnoise.data.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,8 @@ public class NoiseViewer {
     private static final int CENTER_LINE_COLOR = -12566464;
     private static final int DEFAULT_SCALE = 3;
     private static final int PAGE_SIZE = 5;
+    private static final int PAN_AMOUNT = 10;
+    private static final int PAN_DELAY = 3;
     private static final int COORDINATE_RANGE = 1 << 16;
 
     public static void main(final String[] args) {
@@ -68,8 +72,8 @@ public class NoiseViewer {
 
         void getNextInput() {
             System.out.println("n: New image");
-            System.out.println("i: Move up");
-            System.out.println("k: Move down");
+            System.out.println("i: Move up (hold shift to pan)");
+            System.out.println("k: Move down (hold shift to pan)");
             System.out.println("t: Toggle threshold / standard / line mode");
             System.out.println("d: Toggle 3D / 2D");
             System.out.println("l: Convert settings to noiseLookup");
@@ -77,15 +81,18 @@ public class NoiseViewer {
             System.out.println("a: Apply references from storage");
             System.out.println("p: Print settings");
             System.out.println("r: Reset settings");
+            System.out.println("b: Redraw settings (debug)");
             System.out.println("scale <num>: Update 1D scale (for line mode)");
             System.out.println("<key> <value>: Set property");
             System.out.println("q: Exit");
 
             final String command = this.scanner.nextLine();
-            switch (command) {
+            switch (command.trim()) {
                 case "n": this.next(); break;
                 case "i": this.up(); break;
                 case "k": this.down(); break;
+                case "I": this.panUp(); break;
+                case "K": this.panDown(); break;
                 case "t": this.toggle(); break;
                 case "d": this.dimensions(); break;
                 case "l": this.convertToLookup(); break;
@@ -93,6 +100,7 @@ public class NoiseViewer {
                 case "a": this.applyReferences(); break;
                 case "p": this.print(); break;
                 case "r": this.reset(); break;
+                case "b": this.regen(); break;
                 case "q": System.exit(0);
                 default: this.set(command);
             }
@@ -116,6 +124,24 @@ public class NoiseViewer {
             this.y -= PAGE_SIZE;
             System.out.println("Move down");
             this.regen();
+        }
+
+        void panUp() {
+            for (int i = 0; i < PAGE_SIZE * PAN_AMOUNT; i++) {
+                this.y++;
+                try { Thread.sleep(PAN_DELAY); } catch (Exception ignored) {}
+                this.regen();
+            }
+            System.out.println("Panned up");
+        }
+
+        void panDown() {
+            for (int i = 0; i < PAGE_SIZE * PAN_AMOUNT; i++) {
+                this.y--;
+                try { Thread.sleep(PAN_DELAY); } catch (Exception ignored) {}
+                this.regen();
+            }
+            System.out.println("Panned up");
         }
 
         void set(final String command) {
@@ -364,6 +390,8 @@ public class NoiseViewer {
                     }
                     this.builder.threshold(Float.parseFloat(value), Float.parseFloat(args[2]));
                     break;
+                case "":
+                    return;
                 default:
                     System.err.println("Unknown key: " + key);
                     this.set(this.scanner.nextLine());
@@ -446,7 +474,7 @@ public class NoiseViewer {
                     final float n = this.threeD
                         ? this.generator.getNoise(this.x + w, this.y, this.z + h)
                         : this.generator.getNoise(this.x + w, this.z + h);
-                    final int v = (int) ((1.0F + n) * 127.0F);
+                    final int v = Math.max(0, Math.min(255, (int) ((1.0F + n) * 127.0F)));
                     image.setRGB(w, h, new Color(v, v, v).getRGB());
                 }
             }
@@ -493,7 +521,27 @@ public class NoiseViewer {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.pack();
             frame.setVisible(true);
+            label.addMouseListener((MouseClickedLister) e ->
+                System.out.printf("(%s, %s) = %.2f (%s)\n",
+                    e.getX(),
+                    e.getY(),
+                    this.getNoiseAtOffset(e.getX(), e.getY()),
+                    this.getBooleanAtOffset(e.getX(), e.getY()) ? "in" : "out"));
             return frame;
+        }
+
+        float getNoiseAtOffset(int x, int z) {
+            if (this.threeD) {
+                return this.generator.getNoiseScaled(this.x + x, this.y, this.z + z);
+            }
+            return this.generator.getNoiseScaled(this.x + x, this.z + z);
+        }
+
+        boolean getBooleanAtOffset(int x, int z) {
+            if (this.threeD) {
+                return this.generator.getBoolean(this.x + x, this.y, this.z + z);
+            }
+            return this.generator.getBoolean(this.x + x, this.z + z);
         }
     }
 
@@ -501,5 +549,12 @@ public class NoiseViewer {
         STANDARD,
         THRESHOLD,
         LINE
+    }
+
+    private interface MouseClickedLister extends MouseListener {
+        @Override default void mousePressed(MouseEvent e) {}
+        @Override default void mouseReleased(MouseEvent e) {}
+        @Override default void mouseEntered(MouseEvent e) {}
+        @Override default void mouseExited(MouseEvent e) {}
     }
 }

@@ -259,6 +259,7 @@ public class NoiseBuilder {
             case BASIC_GRID: return new WarpedNoise.BasicGrid(this, reference);
             case SIMPLEX2: return new WarpedNoise.Simplex2(this, reference);
             case SIMPLEX2_REDUCED: return new WarpedNoise.Simplex2Reduced(this, reference);
+            case NOISE_LOOKUP: return new WarpedNoise.NoiseLookup(this, reference);
             default: return reference;
         }
     }

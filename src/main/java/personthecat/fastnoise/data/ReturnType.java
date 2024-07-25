@@ -9,6 +9,7 @@ public enum ReturnType {
     CELL_VALUE,
     NOISE_LOOKUP,
     DISTANCE,
+    DISTANCE_SQRT,
     DISTANCE2,
     DISTANCE2_ADD,
     DISTANCE2_SUB,

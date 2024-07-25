@@ -18,7 +18,7 @@ public interface DistanceFunction {
     interface D3 extends DistanceFunction {
         @Override
         default float getDistance(float dX, float dY) {
-            return this.getDistance(dX, 1337, dY);
+            return this.getDistance(dX, dY, 1337);
         }
     }
 }

@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 @Data
 @Accessors(fluent = true)
 @SuppressWarnings({"unused", "UnusedReturnValue"})
-public class NoiseBuilder implements Cloneable {
+public class NoiseBuilder {
 
     private NoiseProvider provider = d -> this.createGenerator();
     private NoiseType type = NoiseType.SIMPLEX;
@@ -264,7 +264,7 @@ public class NoiseBuilder implements Cloneable {
     }
 
     public FastNoise build() {
-        return this.provider.apply(this);
+        return this.provider.generate(this);
     }
 
     public FastNoise buildLookup() {
@@ -278,18 +278,5 @@ public class NoiseBuilder implements Cloneable {
     public FastNoise[] buildReferences() {
         if (this.references.length == 0) return new FastNoise[] { FastNoise.dummy() };
         return Stream.of(this.references).map(NoiseBuilder::build).toArray(FastNoise[]::new);
-    }
-
-    @Override
-    public NoiseBuilder clone() {
-        try {
-            final NoiseBuilder clone = (NoiseBuilder) super.clone();
-            for (int i = 0; i < clone.references.length; i++) {
-                clone.references[i] = clone.references[i].clone();
-            }
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
     }
 }

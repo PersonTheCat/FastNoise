@@ -51,10 +51,6 @@ public abstract class FastNoise {
         return DUMMY;
     }
 
-    protected static <T> T get(final T t, final T def) {
-        return t != null ? t : def;
-    }
-
     public NoiseBuilder toBuilder() {
         return new NoiseBuilder()
             .seed(this.seed)

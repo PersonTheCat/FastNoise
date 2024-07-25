@@ -18,7 +18,7 @@ public interface ReturnFunction {
     interface D3 extends ReturnFunction {
         @Override
         default float getReturn(int x, int y, float d1, float d2, float d3) {
-            return this.getReturn(x, 1337, y, d1, d2, d3);
+            return this.getReturn(x, y, 1337, d1, d2, d3);
         }
     }
 }

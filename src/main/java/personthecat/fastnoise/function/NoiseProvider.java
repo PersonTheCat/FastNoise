@@ -6,4 +6,6 @@ import personthecat.fastnoise.FastNoise;
 import java.util.function.Function;
 
 @FunctionalInterface
-public interface NoiseProvider extends Function<NoiseBuilder, FastNoise> {}
+public interface NoiseProvider {
+    FastNoise generate(NoiseBuilder cfg);
+}

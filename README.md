@@ -77,6 +77,20 @@ For this reason, **you must apply all noise modifier settings directly to the wr
 
 ## Combining Generators
 
+In some case, it may be desirable to combine the output of multiple generators. This is especially useful
+when combining the scaled output of multiple generators--for example, to generate procedural terrain.
+
+```java
+final FastNoise terrain = FastNoise.builder()
+  .type(NoiseType.MULTI)
+  .references(
+    FastNoise.builder().frequency(0.005).range(64, 128),
+    FastNoise.builder().frequency(0.50).range(0, 16))
+  .build();
+
+final float n = terrain.getNoiseScaled(x, y);
+```
+
 ## Wrapping Bare-bones Noise Functions
 
 Alternatively, FastNoise is capable of wrapping raw noise functions. A convenient way to use this feature

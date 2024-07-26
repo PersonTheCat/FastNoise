@@ -65,7 +65,7 @@ passing noise references directly to the Noise Builder API.
 ```java
 final FastNoise generator = FastNoise.builder()
   .type(NoiseType.FRACTAL)
-  .reference(new SimplexNoise())
+  .reference(FastNoise.builder().type(NoiseType.SIMPLEX))
   .frequency(0.02F)
   .build();
 ```
@@ -133,7 +133,7 @@ distort the output in ways not possible with simple config values.
 final FastNoise generator = FastNoise.builder()
   .type(NoiseType.CELLULAR)
   .cellularReturn(ReturnType.NOISE_LOOKUP)
-  .noiseLookup(new SimplexNoise())
+  .noiseLookup(FastNoise.builder().type(NoiseType.SIMPLEX))
   .build();
 ```
 
@@ -143,7 +143,7 @@ final FastNoise generator = FastNoise.builder()
 final FastNoise generator = FastNoise.builder()
   .type(NoiseType.SIMPLEX)
   .warp(WarpType.NOISE_LOOKUP)
-  .noiseLookup(new SimplexNoise())
+  .noiseLookup(FastNoise.builder().type(NoiseType.SIMPLEX))
   .build();
 ```
 
@@ -202,7 +202,7 @@ final FastNoise threeDimensions = FastNoise.builder()
 // directly apply noise output
 final FastNoise combined = FastNoise.builder()
   .multiFunction((output) -> DoubleStream.of(output).sum())
-  .references(new SimplexNoise(), new PerlinNoise())
+  .references(builder().type(NoiseType.SIMPLEX), buidler().type(NoiseType.PERLIN))
   .build();
 
 // apply (x, y) and generators
@@ -212,7 +212,7 @@ final FastNoise twoDimension = FastNoise.builder()
     for (FastNoise n : generators) acc ^= n.getNoise(x, y);
     return acc;
   })
-  .references(new SimplexNoise(), new PerlinNoise())
+  .references(builder().type(NoiseType.SIMPLEX), buidler().type(NoiseType.PERLIN))
   .build();
 
 // apply (x, y, z) and generators
@@ -222,7 +222,7 @@ final FastNoise threeDimension = FastNoise.builder()
     for (FastNoise n : generators) acc ^= n.getNoise(x, y, z);
     return acc;
   })
-  .references(new SimplexNoise(), new PerlinNoise())
+  .references(builder().type(NoiseType.SIMPLEX), buidler().type(NoiseType.PERLIN))
   .build();
 ```
 

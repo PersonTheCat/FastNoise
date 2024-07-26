@@ -18,71 +18,212 @@ This fork of FastNoise is available on Maven Central! To use it in your project,
 dependency in your build.gradle or pom.xml:
 
 ```groovy
-implementation group: 'com.personthecat', name: 'fastnoise', version: '0.9'
+implementation group: 'com.personthecat', name: 'fastnoise', version: '0.10'
 ```
 
 # Using This Library
 
-To create a new generator, start by constructing a `NoiseDescriptor`.  Noise Descriptor is a data
-transfer object designed to create and configure one of the included generator types. It provides an
-API very similar to that of the original library and can be used to **generate** a new FastNoise wrapper
-object.
+The create a new generator, start by constructing a `NoiseBuilder`. The Noise Builder API is a configuration
+capable of automatically generating the recursive data structure used by this library.
 
 ```java
-final FastNoise generator = FastNoise.createDescriptor()
-  .noise(NoiseType.SIMPLEX)
+final FastNoise generator = FastNoise.builder()
+  .type(NoiseType.SIMPLEX)
   .fractal(FractalType.FBM)
   .frequency(0.1F)
-  .generate();
+  .build();
 ```
 
 ## Custom Noise Generators
 
 To supply a custom noise generator into the wrapper, create a class extending from `NoiseGenerator`.
-Constructing this object requires an instance of `NoiseDescriptor`, which is what enables your generator
+Constructing this object requires an instance of `NoiseBuilder`, which is what enables your generator
 to take advantage of the common configurations.
 
 ```java
-final FastNoise generator = FastNoise.createDescriptor()
+final FastNoise generator = FastNoise.builder()
   .provider(MyNoiseGenerator::new)
-  .generate();
+  .build();
 ```
+
+The Noise Builder API will correctly handle wrapping your generator to provide fractal, warped, or 
+scaled output.
+
+```java
+final FastNoise generator = FastNoise.builder()
+  .provider(MyNoiseGenerator::new)
+  .fractal(FractalType.FBM)
+  .warp(WarpType.BASIC_GRID)
+  .build();
+```
+
+## Directly Passing Noise References
+
+In some cases, it is desirable to manually configure wrapped noise generators. This can be achieved by
+passing noise references directly to the Noise Builder API.
+
+```java
+final FastNoise generator = FastNoise.builder()
+  .type(NoiseType.FRACTAL)
+  .reference(new SimplexNoise())
+  .frequency(0.02F)
+  .build();
+```
+
+### Be Careful with Modifier Placement
+
+Most wrapper generators deliberately ignore frequency, offset, and scale settings from their references.
+For this reason, **you must apply all noise modifier settings directly to the wrapper**.
+
+## Combining Generators
 
 ## Wrapping Bare-bones Noise Functions
 
 Alternatively, FastNoise is capable of wrapping raw noise functions. A convenient way to use this feature
-is to construct a `DummyNoiseWrapper`. The output of this wrapper can either be modified by a 
-`NoiseDescriptor` or used directly as a passthrough generator.
+is to construct a `NoiseWrapper`. The output of this wrapper can either be modified by a `NoiseBuilder` 
+or used directly as a passthrough generator.
 
 ```java
-final FastNoise modified = new DummyNoiseWrapper()
-  .wrapNoise2((s, x, y) -> 1)
-  .createDescriptor()
+// Modifiers are significant
+final FastNoise modified = FastNoise.wrapper()
+  .wrapNoise((s, x, y) -> 1)
+  .createBuilder()
   .frequency(0.2F)
-  .generate();
+  .build();
 
-final FastNoise passthrough = new DummyNoiseWrapper()
-  .wrapNoise3((s, x, y, z) -> 1)
+// Modifiers are not significant
+final FastNoise passthrough = FastNoise.wrapper()
+  .wrapNoise((s, x, y, z) -> 1)
   .generatePassthrough();
+```
+
+Notice that the `wrapNoise` method is overloaded to accept `NoiseFunction`s of 1, 2, and 3 dimensions.
+
+```java
+final NoiseWrapper wrapper = FastNoise.wrapper()
+  .wrapNoise((s, x) -> 1);
 ```
 
 ## Using Noise Modifiers
 
-`NoiseDescriptor` also contains a few settings related to the amplitude of the generator output and
+`NoiseBuilder` also contains a few settings related to the amplitude of the generator output and
 thresholds used for creating booleans from the output. The options can be used as follows:
 
 ```java
-
-final FastNoise generator = FastNoise.createDescriptor()
+final FastNoise generator = FastNoise.builder()
   .threshold(0.2F, 0.5F)
   .range(-25.0F, 50.0F)
-  .generate();
+  .build();
 
 // True if original value is in 0.2 ~ 0.5
 final boolean demo1 = generator.getBoolean(1, 2);
 
 // Instead of -1 to 1, is in -25 to 50
 final float demo2 = generator.getNoiseScaled(3, 4);
+```
+
+### Noise Lookups
+
+Some generators support dynamically resolving values from other generators. This can be used to 
+distort the output in ways not possible with simple config values.
+
+### Cellular Return Lookup
+
+```java
+final FastNoise generator = FastNoise.builder()
+  .type(NoiseType.CELLULAR)
+  .cellularReturn(ReturnType.NOISE_LOOKUP)
+  .noiseLookup(new SimplexNoise())
+  .build();
+```
+
+### Domain Warp Lookup
+
+```java
+final FastNoise generator = FastNoise.builder()
+  .type(NoiseType.SIMPLEX)
+  .warp(WarpType.NOISE_LOOKUP)
+  .noiseLookup(new SimplexNoise())
+  .build();
+```
+
+## Using Injectable Functions
+
+A handful of generators support fully custom functions as lambda expressions. These can be used to
+configure the noise output in ways not possible with simple config values.
+
+### Scale Functions
+
+```java
+final FastNoise mountains = FastNoise.builder()
+  .scale(n -> n <= 0 ? n : (float) (((0.000000002 * Math.pow(y, 6)) / 6) + (9 * Math.sqrt(y))))
+  .build();
+```
+
+### Fractal Functions
+
+```java
+final FastNoise log = FastNoise.builder()
+  .fractalFunction(Math::log)
+  .build();
+```
+
+### Cellular Distance Functions
+
+```java
+final FastNoise twoDimensions = FastNoise.builder()
+  .type(NoiseType.CELLULAR)
+  .distanceFunction((dx, dy) -> minkowski(dx, dy, 0.5))
+  .build();
+
+final FastNoise threeDimensions = FastNoise.builder()
+  .type(NoiseType.CELLULAR)
+  .distanceFunction((dx, dy, dz) -> minkowski(dx, dy, dz, 0.5))
+  .build();
+```
+
+### Cellular Return Functions
+
+```java
+final FastNoise twoDimensions = FastNoise.builder()
+  .type(NoiseType.CELLULAR)
+  .returnFunction((x, y, d1, d2, d3) -> avg(d1, d2, d3))
+  .build();
+
+final FastNoise threeDimensions = FastNoise.builder()
+  .type(NoiseType.CELLULAR)
+  .returnFunction((x, y, z, d1, d2, d3) -> avg(d1, d2, d3))
+  .build();
+```
+
+### Multi Functions
+
+```java
+// directly apply noise output
+final FastNoise combined = FastNoise.builder()
+  .multiFunction((output) -> DoubleStream.of(output).sum())
+  .references(new SimplexNoise(), new PerlinNoise())
+  .build();
+
+// apply (x, y) and generators
+final FastNoise twoDimension = FastNoise.builder()
+  .multiFunction((x, y, generators) -> {
+    float acc = 0;
+    for (FastNoise n : generators) acc ^= n.getNoise(x, y);
+    return acc;
+  })
+  .references(new SimplexNoise(), new PerlinNoise())
+  .build();
+
+// apply (x, y, z) and generators
+final FastNoise threeDimension = FastNoise.builder()
+  .multiFunction((x, y, z, generators) -> {
+    float acc = 0;
+    for (FastNoise n : generators) acc ^= n.getNoise(x, y, z);
+    return acc;
+  })
+  .references(new SimplexNoise(), new PerlinNoise())
+  .build();
 ```
 
 ## Testing Noise Output

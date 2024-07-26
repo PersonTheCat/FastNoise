@@ -162,6 +162,8 @@ public class NoiseViewer {
                     if (length == 1) { System.out.println(this.scale); return; }
                     this.scale = Integer.parseInt(value);
                     break;
+                case "mode":
+                case "noise":
                 case "type":
                     if (length == 1) { System.out.println(this.builder.type()); return; }
                     final NoiseType type = NoiseType.from(value);
@@ -186,6 +188,7 @@ public class NoiseViewer {
                     if (distance == null) throw new IllegalArgumentException();
                     this.builder.distance(distance);
                     break;
+                case "return":
                 case "cellularReturn":
                     if (length == 1) { System.out.println(this.builder.cellularReturn()); return; }
                     final ReturnType cellularReturn = ReturnType.from(value);

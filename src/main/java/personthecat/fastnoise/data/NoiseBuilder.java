@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class NoiseBuilder {
 
-    private NoiseProvider provider = d -> this.createGenerator();
+    private NoiseProvider provider = cfg -> this.getBasicGenerator();
     private NoiseType type = NoiseType.SIMPLEX;
     private FractalType fractal = FractalType.NONE;
     private WarpType warp = WarpType.NONE;
@@ -212,20 +212,6 @@ public class NoiseBuilder {
         return this;
     }
 
-    private FastNoise createGenerator() {
-        FastNoise generator = this.getBasicGenerator();
-        if (this.fractal != FractalType.NONE && this.type != NoiseType.FRACTAL) {
-            generator = new FractalNoise(this, generator);
-        }
-        if (this.warp != WarpType.NONE && this.type != NoiseType.WARPED) {
-            generator = this.applyWarp(generator);
-        }
-        if (this.scaleFunction != null) {
-            generator = new ScaledNoise(generator, this.scaleFunction);
-        }
-        return generator;
-    }
-
     private FastNoise getBasicGenerator() {
         switch (this.type) {
             case VALUE: return new ValueNoise(this);
@@ -265,7 +251,17 @@ public class NoiseBuilder {
     }
 
     public FastNoise build() {
-        return this.provider.generate(this);
+        FastNoise generator = this.provider.generate(this);
+        if (this.fractal != FractalType.NONE && this.type != NoiseType.FRACTAL) {
+            generator = new FractalNoise(this, generator);
+        }
+        if (this.warp != WarpType.NONE && this.type != NoiseType.WARPED) {
+            generator = this.applyWarp(generator);
+        }
+        if (this.scaleFunction != null) {
+            generator = new ScaledNoise(generator, this.scaleFunction);
+        }
+        return generator;
     }
 
     public FastNoise buildLookup() {

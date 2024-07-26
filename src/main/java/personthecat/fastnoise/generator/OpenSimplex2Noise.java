@@ -7,7 +7,7 @@ import personthecat.fastnoise.data.NoiseType;
 import static personthecat.fastnoise.util.NoiseUtils.fastFloor;
 import static personthecat.fastnoise.util.NoiseUtils.fastRound;
 import static personthecat.fastnoise.util.NoiseUtils.gradient2L;
-import static personthecat.fastnoise.util.NoiseUtils.gradient3;
+import static personthecat.fastnoise.util.NoiseUtils.gradient3L;
 
 import static personthecat.fastnoise.util.NoiseValues.X_PRIME;
 import static personthecat.fastnoise.util.NoiseValues.Y_PRIME;
@@ -135,26 +135,26 @@ public class OpenSimplex2Noise extends FastNoise {
 
         for (int l = 0; ; l++) {
             if (a > 0) {
-                value += (a * a) * (a * a) * gradient3(seed, i, j, k, x0, y0, z0);
+                value += (a * a) * (a * a) * gradient3L(seed, i, j, k, x0, y0, z0);
             }
 
             if (ax0 >= ay0 && ax0 >= az0) {
                 float b = a + ax0 + ax0;
                 if (b > 1) {
                     b -= 1;
-                    value += (b * b) * (b * b) * gradient3(seed, i - xNSign * X_PRIME, j, k, x0 + xNSign, y0, z0);
+                    value += (b * b) * (b * b) * gradient3L(seed, i - xNSign * X_PRIME, j, k, x0 + xNSign, y0, z0);
                 }
             } else if (ay0 > ax0 && ay0 >= az0) {
                 float b = a + ay0 + ay0;
                 if (b > 1) {
                     b -= 1;
-                    value += (b * b) * (b * b) * gradient3(seed, i, j - yNSign * Y_PRIME, k, x0, y0 + yNSign, z0);
+                    value += (b * b) * (b * b) * gradient3L(seed, i, j - yNSign * Y_PRIME, k, x0, y0 + yNSign, z0);
                 }
             } else {
                 float b = a + az0 + az0;
                 if (b > 1) {
                     b -= 1;
-                    value += (b * b) * (b * b) * gradient3(seed, i, j, k - zNSign * Z_PRIME, x0, y0, z0 + zNSign);
+                    value += (b * b) * (b * b) * gradient3L(seed, i, j, k - zNSign * Z_PRIME, x0, y0, z0 + zNSign);
                 }
             }
 

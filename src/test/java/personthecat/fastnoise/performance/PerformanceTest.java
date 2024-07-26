@@ -1,5 +1,7 @@
-package personthecat.fastnoise;
+package personthecat.fastnoise.performance;
 
+import personthecat.fastnoise.FastNoise;
+import personthecat.fastnoise.OriginalFastNoise;
 import personthecat.fastnoise.data.FractalType;
 import personthecat.fastnoise.data.NoiseType;
 import personthecat.fastnoise.data.DistanceType;

@@ -136,15 +136,25 @@ public class NoiseUtils {
     }
 
     public static int hash2L(int seed, int xPrimed, int yPrimed) {
-        int hash = seed ^ xPrimed ^ yPrimed;
-
-        hash *= 0x27d4eb2d;
-        return hash;
+        return (seed ^ xPrimed ^ yPrimed) * 0x27d4eb2d;
     }
 
+    public static int hash3L(int seed, int xPrimed, int yPrimed, int zPrimed) {
+        return (seed ^ xPrimed ^ yPrimed ^ zPrimed) *  0x27d4eb2d;
+    }
+
+    public static float value2L(int seed, int xPrimed, int yPrimed) {
+        int n = seed ^ xPrimed ^ yPrimed;
+        return (n * n * n * 60493) * (1F / (float) 2147483648.0);
+    }
+
+    public static float value3L(int seed, int xPrimed, int yPrimed, int zPrimed) {
+        int n = seed ^ xPrimed ^ yPrimed ^ zPrimed;
+        return (n * n * n * 60493) * (1F / (float) 2147483648.0);
+    }
 
     public static float gradient2L(int seed, int xPrimed, int yPrimed, float xd, float yd) {
-        int hash = hash2(seed, xPrimed, yPrimed);
+        int hash = (seed ^ xPrimed ^ yPrimed) * 0x27d4eb2d;
         hash ^= hash >> 15;
         hash &= 127 << 1;
 
@@ -152,5 +162,17 @@ public class NoiseUtils {
         float yg = NoiseTables.GRAD_2DL[hash | 1];
 
         return xd * xg + yd * yg;
+    }
+
+    public static float gradient3L(int seed, int xPrimed, int yPrimed, int zPrimed, float xd, float yd, float zd) {
+        int hash = (seed ^ xPrimed ^ yPrimed ^ zPrimed) *  0x27d4eb2d;
+        hash ^= hash >> 15;
+        hash &= 63 << 2;
+
+        float xg = NoiseTables.GRAD_3DL[hash];
+        float yg = NoiseTables.GRAD_3DL[hash | 1];
+        float zg = NoiseTables.GRAD_3DL[hash | 2];
+
+        return xd * xg + yd * yg + zd * zg;
     }
 }
